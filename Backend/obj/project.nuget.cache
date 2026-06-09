@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "iZ1VWVSNYGE=",
+  "dgSpecHash": "KAed68RBcSI=",
   "success": true,
-  "projectFilePath": "\\\\wsl.localhost\\Ubuntu\\home\\user\\projects\\Diploma\\Приложение\\Backend\\SmartFixApi.csproj",
+  "projectFilePath": "C:\\Users\\E66\\SmartFixWeb\\Backend\\SmartFixApi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\E66\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\E66\\.nuget\\packages\\humanizer\\2.14.1\\humanizer.2.14.1.nupkg.sha512",
