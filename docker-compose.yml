@@ -49,9 +49,9 @@ services:
     ports:
       - "3000:80"
     volumes:
-      - ./data/static/avatars:/usr/share/nginx/html/avatars:ro
-      - ./data/static/services:/usr/share/nginx/html/services:ro
-      - ./data/static/uploads:/usr/share/nginx/html/uploads:ro
+      - ./Backend/wwwroot/avatars:/usr/share/nginx/html/avatars:ro
+      - ./Backend/wwwroot/uploads:/usr/share/nginx/html/uploads:ro
+      - ./Backend/wwwroot/services:/usr/share/nginx/html/services:ro
     depends_on:
       - backend
 
