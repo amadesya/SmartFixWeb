@@ -19,6 +19,11 @@
 -- Table structure for table `__efmigrationshistory`
 --
 
+CREATE DATABASE IF NOT EXISTS smartfix;
+CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY 'root';
+GRANT ALL PRIVILEGES ON smartfix.* TO 'root'@'%';
+FLUSH PRIVILEGES;
+
 DROP TABLE IF EXISTS `__efmigrationshistory`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
