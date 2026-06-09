@@ -1,0 +1,19 @@
+# Системные и временные файлы
+.DS_Store
+.vscode/
+.vs/
+*.log
+
+# Папки сборки .NET
+bin/
+obj/
+publish/
+
+# Docker и базы данных
+.env
+*.db
+*.sqlite
+dump.sql
+
+# Личные настройки
+*.user
