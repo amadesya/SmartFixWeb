@@ -35,9 +35,7 @@ services:
       - ConnectionStrings__DefaultConnection=Server=db;Database=${DB_NAME};Uid=${DB_USER};Pwd=${DB_PASSWORD};
     volumes:
       # Монтируем общую папку для аватарок (путь зависит от WORKDIR в Dockerfile бэкенда, обычно это /app)
-      - avatars_data:/app/wwwroot/avatars
-      - services_data:/app/wwwroot/services
-      - uploads_data:/app/wwwroot/uploads
+      - static_files:/app/wwwroot/uploads
     depends_on:
       db:
         condition: service_healthy
@@ -51,15 +49,10 @@ services:
     ports:
       - "3000:80"
     volumes:
-      # Монтируем ту же самую папку в Nginx для прямой раздачи
-      - avatars_data:/usr/share/nginx/html/avatars:ro  # :ro означает read-only, Nginx только читает
-      - services_data:/usr/share/nginx/html/services:ro  # :ro означает read-only, Nginx только читает
-      - uploads_data:/usr/share/nginx/html/uploads:ro
+      - static_files:/usr/share/nginx/html/uploads:ro
     depends_on:
       - backend
 
 volumes:
   mysql_data:
-  avatars_data:  # Объявляем новый именованный volume для аватарок
-  services_data:  # Объявляем новый именованный volume для услуг
-  uploads_data:  # Объявляем новый именованный volume для загруженных файлов
+  static_files:  # Объявляем новый именованный volume для статических файлов

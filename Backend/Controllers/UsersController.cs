@@ -270,8 +270,8 @@ public class UsersController : ControllerBase
                 }
 
                 // Сохраняем новый URL в БД
-                var baseUrl = $"{Request.Scheme}://{Request.Host}";
-                user.Avatar = $"{baseUrl}/avatars/{newFileName}";
+                // var baseUrl = $"{Request.Scheme}://{Request.Host}";
+                user.Avatar = $"/avatars/{newFileName}";
             }
             // --- КОНЕЦ БЛОКА ОБРАБОТКИ АВАТАРА ---
             if (!string.IsNullOrWhiteSpace(dto.Password))
