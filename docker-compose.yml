@@ -35,7 +35,7 @@ services:
       - ConnectionStrings__DefaultConnection=Server=db;Database=${DB_NAME};Uid=${DB_USER};Pwd=${DB_PASSWORD};
     volumes:
       # Монтируем общую папку для аватарок (путь зависит от WORKDIR в Dockerfile бэкенда, обычно это /app)
-      - static_files:/app/wwwroot/uploads
+      - ./data/uploads:/app/wwwroot/uploads
     depends_on:
       db:
         condition: service_healthy
@@ -50,8 +50,8 @@ services:
       - "3000:80"
     volumes:
       - ./Backend/wwwroot/avatars:/usr/share/nginx/html/avatars:ro
-      - ./Backend/wwwroot/uploads:/usr/share/nginx/html/uploads:ro
       - ./Backend/wwwroot/services:/usr/share/nginx/html/services:ro
+      - ./data/uploads:/usr/share/nginx/html/uploads:ro
     depends_on:
       - backend
 
