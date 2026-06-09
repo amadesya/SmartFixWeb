@@ -1,0 +1,168 @@
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 10px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #334155;
+  }
+
+  /* Скрыть скроллбар для вкладок */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Скрываем скроллбар для IE, Edge и Firefox */
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    /* IE и Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
+}
+
+@layer base {
+:root {
+    --smartfix-darkest: #DAF1DE;
+    /* Подменяем на светлый для светлой темы */
+    --smartfix-darker: #8EB69B;
+    --smartfix-dark: #235347;
+    --smartfix-medium: #163832;
+    --smartfix-light: #0B2B26;
+    --smartfix-lightest: #051F20;
+    /* Подменяем на темный */
+  }
+
+  html.dark {
+    /* ТЕМНАЯ ТЕМА (Полностью по палитре с картинки) */
+
+    /* Самый темный цвет для фона: #051F20 */
+    --background: 183 23% 7%;
+    --foreground: oklch(0.95 0.02 170);
+    /* Близко к нижнему цвету палитры */
+
+    /* Цвет карточек и модалок: #0B2B26 */
+    --card: 171 59% 11%;
+    --card-foreground: oklch(0.98 0.02 170);
+
+    --popover: 171 59% 11%;
+    --popover-foreground: oklch(0.98 0.02 170);
+
+    /* Основной акцентный цвет (кнопки): #235347 */
+    --primary: 166 41% 23%;
+    --primary-foreground: oklch(0.98 0.02 170);
+
+    /* Вторичный цвет (выделение): #163832 */
+    --secondary: 171 43% 15%;
+    --secondary-foreground: oklch(0.98 0.02 170);
+
+    /* Приглушенные элементы (бордеры и инпуты) */
+    --muted: 171 43% 15%;
+    --muted-foreground: oklch(0.7 0.05 170);
+
+    --accent: 166 41% 23%;
+    --accent-foreground: oklch(0.98 0.02 170);
+
+    /* Границы: используем #163832 с прозрачностью */
+    --border: 171 43% 25%;
+    --input: 171 43% 20%;
+    --ring: 166 41% 35%;
+
+    /* Цвета для графиков/элементов из светлой части палитры (#8EB69B) */
+    --chart-1: 146 22% 64%;
+    --chart-2: 166 41% 23%;
+
+    /* Боковая панель */
+    --sidebar: 183 23% 5%;
+    --sidebar-foreground: oklch(0.95 0.02 170);
+    --sidebar-primary: 166 41% 23%;
+    --sidebar-border: 171 43% 15%;
+  }
+}
+
+@theme inline {
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+
+    to {
+      transform: translateX(calc(-100% - var(--gap)));
+    }
+  }
+
+  @keyframes marquee-vertical {
+    from {
+      transform: translateY(0);
+    }
+
+    to {
+      transform: translateY(calc(-100% - var(--gap)));
+    }
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(calc(-100% - 1rem));
+  }
+}
+
+@keyframes marquee-vertical {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(calc(-100% - 1rem));
+  }
+}
+
+.animate-marquee {
+  animation-name: marquee;
+  animation-duration: var(--duration);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.animate-marquee-vertical {
+  animation-name: marquee-vertical;
+  animation-duration: var(--duration);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@layer components {
+  .btn-smartfix-success {
+    @apply bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg transition-all active:scale-[0.98] shadow-lg shadow-emerald-900/20 disabled:opacity-50;
+  }
+}

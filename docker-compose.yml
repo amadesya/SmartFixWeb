@@ -1,0 +1,65 @@
+services:
+  db:
+    image: mysql:8.0.44
+    container_name: smartfix-db
+    restart: always
+    command: --lower_case_table_names=1
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    container_name: smartfix-backend
+    restart: always
+    ports:
+      - "8080:80"
+    dns:
+      - 8.8.8.8
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=db;Database=${DB_NAME};Uid=${DB_USER};Pwd=${DB_PASSWORD};
+    volumes:
+      # Монтируем общую папку для аватарок (путь зависит от WORKDIR в Dockerfile бэкенда, обычно это /app)
+      - avatars_data:/app/wwwroot/avatars
+      - services_data:/app/wwwroot/services
+      - uploads_data:/app/wwwroot/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./Refactor/Front
+      dockerfile: Dockerfile
+    container_name: smartfix-frontend
+    restart: always
+    ports:
+      - "3000:80"
+    volumes:
+      # Монтируем ту же самую папку в Nginx для прямой раздачи
+      - avatars_data:/usr/share/nginx/html/avatars:ro  # :ro означает read-only, Nginx только читает
+      - services_data:/usr/share/nginx/html/services:ro  # :ro означает read-only, Nginx только читает
+      - uploads_data:/usr/share/nginx/html/uploads:ro
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
+  avatars_data:  # Объявляем новый именованный volume для аватарок
+  services_data:  # Объявляем новый именованный volume для услуг
+  uploads_data:  # Объявляем новый именованный volume для загруженных файлов
