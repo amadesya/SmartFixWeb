@@ -20,8 +20,8 @@
 --
 
 CREATE DATABASE IF NOT EXISTS smartfix;
-CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY 'root';
-GRANT ALL PRIVILEGES ON smartfix.* TO 'root'@'%';
+CREATE USER IF NOT EXISTS 'user'@'%' IDENTIFIED BY 'user';
+GRANT ALL PRIVILEGES ON smartfix.* TO 'user'@'%';
 FLUSH PRIVILEGES;
 
 DROP TABLE IF EXISTS `__efmigrationshistory`;
