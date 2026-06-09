@@ -78,19 +78,34 @@ public class ServicesController : ControllerBase {
 
         string? imageUrl = dto.ImageUrl;
 
-        if (dto.ImageFile != null)
+        if (dto.ImageFile != null && dto.ImageFile.Length > 0)
         {
-            var uploadsFolder = Path.Combine(_env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "uploads");
-            if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
-            
-            var uniqueFileName = Guid.NewGuid().ToString() + "_" + dto.ImageFile.FileName;
-            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-            
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            try
             {
-                await dto.ImageFile.CopyToAsync(fileStream);
+                // 1. Формируем путь (используем только Guid, чтобы избежать кириллицы)
+                var uploadsFolder = Path.Combine(_env.WebRootPath ?? Path.Combine(AppContext.BaseDirectory, "wwwroot"), "uploads");
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                var extension = Path.GetExtension(dto.ImageFile.FileName);
+                var uniqueFileName = $"{Guid.NewGuid()}{extension}";
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                // 2. Сохранение файла
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await dto.ImageFile.CopyToAsync(fileStream);
+                }
+
+                imageUrl = "/uploads/" + uniqueFileName;
+
+                // 3. ЛОГИРОВАНИЕ (поможет найти ошибку!)
+                Console.WriteLine($"Файл успешно записан: {filePath}");
             }
-            imageUrl = "/uploads/" + uniqueFileName;
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Критическая ошибка при сохранении файла: {ex.Message}");
+                throw; // Пробросить ошибку, чтобы фронтенд увидел 500 статус
+            }
         }
 
         var service = new Service
@@ -132,21 +147,35 @@ public class ServicesController : ControllerBase {
 
         string? imageUrl = dto.ImageUrl ?? service.ImageUrl;
 
-        if (dto.ImageFile != null)
+        if (dto.ImageFile != null && dto.ImageFile.Length > 0)
         {
-            var uploadsFolder = Path.Combine(_env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "uploads");
-            if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
-            
-            var uniqueFileName = Guid.NewGuid().ToString() + "_" + dto.ImageFile.FileName;
-            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-            
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            try
             {
-                await dto.ImageFile.CopyToAsync(fileStream);
-            }
-            imageUrl = "/uploads/" + uniqueFileName;
-        }
+                // 1. Формируем путь (используем только Guid, чтобы избежать кириллицы)
+                var uploadsFolder = Path.Combine(_env.WebRootPath ?? Path.Combine(AppContext.BaseDirectory, "wwwroot"), "uploads");
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
 
+                var extension = Path.GetExtension(dto.ImageFile.FileName);
+                var uniqueFileName = $"{Guid.NewGuid()}{extension}";
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                // 2. Сохранение файла
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await dto.ImageFile.CopyToAsync(fileStream);
+                }
+
+                imageUrl = "/uploads/" + uniqueFileName;
+
+                // 3. ЛОГИРОВАНИЕ (поможет найти ошибку!)
+                Console.WriteLine($"Файл успешно записан: {filePath}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Критическая ошибка при сохранении файла: {ex.Message}");
+                throw; // Пробросить ошибку, чтобы фронтенд увидел 500 статус
+            }
+        }
         service.Name = dto.Name;
         service.Description = dto.Description;
         service.Price = dto.Price;
