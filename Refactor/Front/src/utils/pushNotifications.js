@@ -37,7 +37,7 @@ export async function subscribeUserToPush(userId) {
   };
 
   const response = await fetch(
-    "http://localhost/api/PushNotifications/subscribe",
+    "http://backend/api/PushNotifications/subscribe",
     {
       // Укажите ваш порт бэкенда
       method: "POST",

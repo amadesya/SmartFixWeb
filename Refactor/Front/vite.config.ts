@@ -10,11 +10,11 @@ export default defineConfig(({ mode }) => {
         host: '0.0.0.0',
         proxy: {
           '/api': {
-            target: 'http://localhost:80',
+            target: 'http://backend:80',
             changeOrigin: true,
           },
           '/notificationHub': {
-            target: 'http://localhost:80',
+            target: 'http://backend:80',
             changeOrigin: true,
             ws: true,
           },
