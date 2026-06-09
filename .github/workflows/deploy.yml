@@ -17,5 +17,6 @@ jobs:
           script: |
             cd /root/SmartFixWeb
             git pull origin main
-            docker-compose down
+            # Эта команда удаляет старые контейнеры, предотвращая конфликт имен
+            docker-compose down 
             docker-compose up -d --build
