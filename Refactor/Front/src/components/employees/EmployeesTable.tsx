@@ -13,11 +13,11 @@ const EmployeesTable: React.FC<EmployeesTableProps> = ({ employees, onDelete, on
     const columns = useMemo<Column<EmployeeDto>[]>(() => [
         {
             header: 'ID',
-            render: (emp) => <span className="text-gray-400">{emp.id}</span>
+            render: (emp) => <span className=" text-smartfix-darker dark:text-white">{emp.id}</span>
         },
         {
             header: 'Имя',
-            render: (emp) => <span className="font-bold text-white">{emp.userName}</span>
+            render: (emp) => <span className="font-bold  text-smartfix-darker dark:text-white">{emp.userName}</span>
         },
         {
             header: 'Роль',
@@ -32,11 +32,11 @@ const EmployeesTable: React.FC<EmployeesTableProps> = ({ employees, onDelete, on
         },
         {
             header: 'Оклад',
-            render: (emp) => <span className="font-bold text-white">{emp.baseSalary.toLocaleString('ru-RU')} ₽</span>
+            render: (emp) => <span className="font-bold  text-smartfix-darker dark:text-white">{emp.baseSalary.toLocaleString('ru-RU')} ₽</span>
         },
         {
             header: 'Премия (%)',
-            render: (emp) => <span className="font-bold text-white">{emp.bonusPercentage}%</span>
+            render: (emp) => <span className="font-bold  text-smartfix-darker dark:text-white">{emp.bonusPercentage}%</span>
         },
         {
             header: 'Действия',
