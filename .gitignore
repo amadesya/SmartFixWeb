@@ -17,3 +17,11 @@ dump.sql
 
 # Личные настройки
 *.user
+
+# Зависимости Node.js (фронтенд)
+node_modules/
+dist/
+
+# Локальные настройки и кэш VS Code / Игры
+.vscode/
+*.user
