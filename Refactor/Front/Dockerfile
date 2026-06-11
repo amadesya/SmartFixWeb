@@ -10,6 +10,10 @@ RUN npm ci
 COPY . .
 
 # Собираем production-бандл (Vite обработает Tailwind корректно)
+# Принимаем аргумент из docker-compose
+ARG VITE_API_URL
+# Делаем его доступным для Vite во время сборки
+ENV VITE_API_URL=$VITE_API_URL
 ENV NODE_OPTIONS="--max-old-space-size=1536"
 RUN npm run build
 
