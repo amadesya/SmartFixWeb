@@ -75,7 +75,7 @@ namespace SmartFixApi.Controllers
                 else if (user.TotalSpent >= 10000) { user.LoyaltyTier = LoyaltyTier.Silver; user.PersonalDiscount = 10; }
 
                 await _db.SaveChangesAsync();
-                return Ok(new { url = "/requests" });
+                return Ok(new { url = "local" });
             }
 
             var shopId = "1338519";
