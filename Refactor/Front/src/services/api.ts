@@ -10,13 +10,13 @@ import {
   MasterStatsDto
 } from "../types";
 
-export const API_URL = import.meta.env.VITE_API_URL || "/api";
-
 export function getApiBaseUrl(): string {
   const url = import.meta.env.VITE_API_URL || "/api";
   // Удаляет слеш на конце, если он есть (превращает "/api/" в "/api")
   return url.endsWith('/') ? url.slice(0, -1) : url;
 }
+
+export const API_URL = getApiBaseUrl(); // Теперь слешей-дубликатов точно не будет
 
 /** URL хаба уведомлений — тот же хост, что и API (см. VITE_API_URL). */
 export function getNotificationHubUrl(): string {

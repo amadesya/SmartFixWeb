@@ -77,9 +77,10 @@ builder.Services.AddCors(options =>
         else
         {
             // На сервере (Production) оставляем ваш рабочий вариант
-            policy.AllowAnyOrigin()
+            policy.SetIsOriginAllowed(origin => true) // Разрешает любой origin
                   .AllowAnyMethod()
-                  .AllowAnyHeader();
+                  .AllowAnyHeader()
+                  .AllowCredentials(); // Обязательно для работы SignalR на сервере
         }
     });
 });
@@ -123,5 +124,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapHub<NotificationHub>("/notificationHub");
+app.MapHub<NotificationHub>("/api/notificationHub"); // Добавляем /api чтобы совпадало с фронтом
 app.Run();
