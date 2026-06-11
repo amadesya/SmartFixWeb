@@ -48,6 +48,8 @@ services:
     restart: always
     ports:
       - "3000:80"
+    environment:
+      - VITE_API_URL=http://backend:80
     volumes:
       - ./Backend/wwwroot/avatars:/usr/share/nginx/html/avatars:ro
       - ./Backend/wwwroot/services:/usr/share/nginx/html/services:ro
