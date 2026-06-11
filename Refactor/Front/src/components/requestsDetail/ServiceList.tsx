@@ -47,12 +47,12 @@ export const ServiceList = ({ editor }: { editor: EditorType }) => {
                                 <div
                                     key={`srv-${service.id}`}
                                     onClick={() => actions.handleToggleService(service)}
-                                    className="flex justify-between items-center py-3 border border-white/5 transition-colors cursor-pointer group hover:bg-white/[0.02] px-2 rounded-xl bg-smartfix-darker/50"
+                                    className="flex justify-between items-center py-3 border dark:border-white/5 border-smartfix-medium/30 transition-colors cursor-pointer px-2 rounded-xl dark:bg-smartfix-darker/50 bg-white-50 group hover:bg-white/[0.02]"
                                 >
                                     <div className='m-1'>
                                         <span className={`text-sm leading-tight break-words whitespace-normal transition-colors ${isSelected
                                             ? 'text-emerald-400 font-bold'
-                                            : 'text-smartfix-lightest/70 group-hover:text-white'
+                                            : 'text-color-black dark:text-smartfix-lightest/70 group-hover:text-green-400'
                                             }`}>
                                             {service.name}
                                         </span>
@@ -72,7 +72,7 @@ export const ServiceList = ({ editor }: { editor: EditorType }) => {
                                             </div>
                                         ) : (
                                             /* Здесь меняем цвет на изумрудный только при наведении, либо заменяем на постоянный */
-                                            <span className="text-sm font-bold tabular-nums group-hover:text-emerald-400 transition-colors text-smartfix-lightest/70">
+                                                <span className="text-sm font-bold tabular-nums group-hover:text-emerald-400 transition-colors text-color-black dark:text-smartfix-lightest/70">
                                                 {actions.formatPrice(service.price)} ₽
                                             </span>
                                         )}

@@ -90,15 +90,16 @@ export const PartList = ({ editor }: { editor: EditorType }) => {
                                 <div
                                     key={`prt-${part.id}`}
                                     onClick={isOutOfStock && !isSelected ? undefined : () => actions.handleTogglePart(part)}
-                                    className={`flex flex-col py-3 border border-white/5 transition-colors px-2 rounded-xl bg-smartfix-darker/50 ${
+                                    className={`flex flex-col py-3 border dark:border-white/5 border-smartfix-medium/30  transition-colors px-2 rounded-xl dark:bg-smartfix-darker/50 bg-white-50 ${
                                         isOutOfStock && !isSelected ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer group hover:bg-white/[0.02]'
                                     }`}
                                 >
-                                    <div className="flex justify-between items-center w-full m-1">
+                                    <div className="flex justify-between items-center w-full m-1 border-black">
                                         <div className="flex-1 min-w-0 pr-4">
-                                            <span className={`text-sm leading-tight break-words whitespace-normal transition-colors ${isSelected
-                                                ? (selected.isHidden ? 'text-smartfix-medium line-through' : 'text-blue-400 font-bold')
-                                                : 'text-smartfix-lightest/70 group-hover:text-white'}`}>
+                                            <span className={`text-gray-900 text-sm leading-tight break-words whitespace-normal transition-colors ${isSelected
+                                                ? (selected.isHidden ? 'text-smartfix-medium  line-through' : 'text-blue-400 font-bold')
+                                                : 'text-black dark:text-smartfix-lightest/70 group-hover:text-blue-400 transition-colors'
+                                                }}`}>
                                                 {part.name}{part.stockQuantity !== 1 && part.stockQuantity > 0 ? ` (${part.stockQuantity} шт.)` : ''}
                                                 {isOutOfStock && !isSelected && <span className="text-red-400 text-xs ml-2 font-bold whitespace-nowrap">Нет в наличии</span>}
                                             </span>
@@ -121,7 +122,7 @@ export const PartList = ({ editor }: { editor: EditorType }) => {
                                                     {selected.isHidden && <span className="text-[10px] uppercase text-smartfix-medium font-bold tracking-wider">Скрыто</span>}
                                                 </div>
                                             ) : (
-                                                <span className="text-sm font-bold tabular-nums group-hover:text-blue-400 transition-colors text-smartfix-lightest/70">
+                                                <span className="text-sm font-bold tabular-nums group-hover:text-blue-400 transition-colors dark:text-smartfix-lightest/70 text-color-black">
                                                     {actions.formatPrice(part.purchasePrice || part.price)} ₽
                                                 </span>
                                             )}

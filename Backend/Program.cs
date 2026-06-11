@@ -65,10 +65,23 @@ builder.Services.AddAuthorization();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              );
+    {
+        // Если проект запущен локально (в режиме разработки)
+        if (builder.Environment.IsDevelopment())
+        {
+            policy.SetIsOriginAllowed(origin => true) // Разрешает любой origin (включая localhost с любым портом)
+                  .AllowAnyMethod()
+                  .AllowAnyHeader()
+                  .AllowCredentials(); // На локалке SignalR не будет ругаться
+        }
+        else
+        {
+            // На сервере (Production) оставляем ваш рабочий вариант
+            policy.AllowAnyOrigin()
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        }
+    });
 });
 
 builder.Services.AddSingleton<ITelegramService, TelegramService>();
@@ -81,6 +94,7 @@ var app = builder.Build();
 // ВРЕМЕННЫЙ ТЕСТОВЫЙ ВАРИАНТ (Swagger доступен всегда)
 // if (app.Environment.IsDevelopment())
 // {
+app.UseCors("AllowAll");      
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
@@ -104,7 +118,6 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseStaticFiles(); // На случай, если есть другие статические файлы
 
 app.UseRouting();
-app.UseCors("AllowAll");      
 app.UseAuthentication();
 app.UseAuthorization();
 

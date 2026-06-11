@@ -129,7 +129,7 @@ const ProfilePage: React.FC = () => {
                     </div>
 
                     <div className="pt-6">
-                        <Button type="submit" disabled={isSaving} className="w-full md:w-auto px-12">
+                        <Button type="submit" disabled={isSaving} className="w-full md:w-auto px-12 bg-smartfix-dark hover:bg-smartfix-dark/80 text-white">
                             {isSaving ? 'Сохранение...' : 'Сохранить изменения'}
                         </Button>
                     </div>

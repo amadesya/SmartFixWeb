@@ -21,21 +21,21 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
                     type="button"
                     onClick={onPushSubscribe}
                     disabled={isSubscribing}
-                    className="w-full flex items-center justify-center gap-2 h-[42px] text-sm rounded-lg"
+                    className="w-full flex items-center justify-center gap-2 h-[42px] text-sm rounded-lg bg-smartfix-dark hover:bg-smartfix-dark/80 text-white"
                 >
                     <Bell size={18} />
                     <span>{isSubscribing ? 'Настройка...' : 'Уведомления в браузере'}</span>
                 </Button>
 
                 {/* Кнопка 2: Telegram (теперь точно такая же) */}
-                <button
+                {/* <button
                     type="button"
                     onClick={() => window.open(botUrl, '_blank', 'noopener,noreferrer')}
                     className="w-full flex items-center justify-center gap-2 h-[42px] bg-[#0088cc] hover:bg-[#007bb5] text-white text-sm rounded-lg transition-all active:scale-[0.98] shadow-sm"
                 >
                     <Send size={18} />
                     <span>Подключить Telegram</span>
-                </button>
+                </button> */}
                 </div>
             </div>
     );

@@ -6,10 +6,10 @@ type EditorType = ReturnType<typeof usePriceEditor>;
 export const EditSummary = ({ editor }: { editor: EditorType }) => {
     const { state, actions } = editor;
     return (
-        <div className="mt-2 ml-1 shrink-0 bg-smartfix-dark border-t-2 border-white/5 pt-4 pb-2 flex flex-col gap-2 w-full">
+        <div className="mt-2 ml-1 shrink-0 bg-white dark:bg-smartfix-dark border-t-2 border-white/5 pt-4 pb-2 flex flex-col gap-2 w-full">
             <div className="flex flex-col w-full">
                 <div className="flex justify-between items-center pt-2">
-                    <span className="info-label text-smartfix-lightest text-xs font-bold uppercase tracking-wider">Итого к оплате</span>
+                    <span className="info-label text-black dark:text-smartfix-lightest text-xs font-bold uppercase tracking-wider">Итого к оплате</span>
                     <span className={`font-bold mr-4 text-emerald-400 text-right shrink-0 tabular-nums ${state.total > 999999 ? 'text-2xl' : 'text-3xl'}`}>
                         {actions.formatPrice(state.total)} ₽
                     </span>
