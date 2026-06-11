@@ -94,7 +94,7 @@ var app = builder.Build();
 // ВРЕМЕННЫЙ ТЕСТОВЫЙ ВАРИАНТ (Swagger доступен всегда)
 // if (app.Environment.IsDevelopment())
 // {
-app.UseCors("AllowAll");      
+
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
@@ -118,6 +118,7 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseStaticFiles(); // На случай, если есть другие статические файлы
 
 app.UseRouting();
+app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 
