@@ -45,13 +45,13 @@ services:
       context: ./Refactor/Front
       dockerfile: Dockerfile
       args:
-      - VITE_API_URL=http://backend:80
+      - VITE_API_URL=http://157.22.205.103:8080/api
     container_name: smartfix-frontend
     restart: always
     ports:
       - "3000:80"
     environment:
-      - VITE_API_URL=http://backend:80
+      - VITE_API_URL=http://157.22.205.103:8080/api
     volumes:
       - ./Backend/wwwroot/avatars:/usr/share/nginx/html/avatars:ro
       - ./Backend/wwwroot/services:/usr/share/nginx/html/services:ro
