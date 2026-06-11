@@ -20,6 +20,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     const [name, setName] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isAgreed, setIsAgreed] = useState(false);
 
     const resetFormState = () => {
         setError('');
@@ -50,12 +51,19 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 } else {
                     setError('Неверный email или пароль.');
                 }
-            } else {
-                // Логика регистрации
+            } 
+            else {
+                // 1. Проверяем, стоит ли галочка
+                if (!isAgreed) {
+                    setError('Пожалуйста, примите лицензионное соглашение перед регистрацией.');
+                    return; // Прерываем выполнение, если не согласен
+                }
+
+                // 2. Если галочка стоит, логика регистрации продолжается
                 const user = await register(name, email, password);
                 if (user) {
                     onClose();
-                    navigate('/requests'); // Перенаправляем после регистрации
+                    navigate('/requests');
                 } else {
                     setError('Пользователь с таким email уже существует.');
                 }
@@ -106,6 +114,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                     <RegisterFlow
                         register={register}
                         onSuccess={() => setIsLoginView(true)}
+                        isAgreed={isAgreed}
+                        setIsAgreed={setIsAgreed}
+                        error={error}
                     />
                 )}
             </div>
