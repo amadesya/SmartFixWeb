@@ -19,11 +19,13 @@ namespace SmartFixApi.Controllers
     public class PayController : Controller
     {
         private readonly AppDbContext _db;
-        public PayController(AppDbContext db) { _db = db; }
+        private readonly IConfiguration _config;
+        public PayController(AppDbContext db, IConfiguration config) { _config = config; _db = db; }
 
         [HttpPost("requests/{id}/pay")]
         public async Task<IActionResult> Pay(int id, [FromBody] PayRequest dto)
         {
+            var frontendUrl = _config["FrontendUrl"];
             var requestOrder = await _db.RepairRequests.FindAsync(id);
 
             if (requestOrder == null)
@@ -75,7 +77,7 @@ namespace SmartFixApi.Controllers
                 else if (user.TotalSpent >= 10000) { user.LoyaltyTier = LoyaltyTier.Silver; user.PersonalDiscount = 10; }
 
                 await _db.SaveChangesAsync();
-                return Ok(new { url = "local" });
+                return Ok(new { url = $"{frontendUrl}/requests" });
             }
 
             var shopId = "1338519";
@@ -96,7 +98,7 @@ namespace SmartFixApi.Controllers
                 confirmation = new
                 {
                     type = "redirect",
-                    return_url = $"http://localhost:3000/requests/"
+                    return_url = $"{frontendUrl}/requests/"
                 },
                 description = $"Оплата ремонта по заявке #{id}",
                 capture = true
