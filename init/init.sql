@@ -19,9 +19,16 @@
 -- Table structure for table `__efmigrationshistory`
 --
 
+-- Создаем базу, если ее нет
 CREATE DATABASE IF NOT EXISTS smartfix;
-CREATE USER IF NOT EXISTS 'user'@'%' IDENTIFIED BY 'user';
-GRANT ALL PRIVILEGES ON smartfix.* TO 'user'@'%';
+
+-- Создаем пользователя, который может подключаться ТОЛЬКО из сети Docker
+-- (используем имя сервиса или маску сети, если Docker настроен)
+CREATE USER IF NOT EXISTS 'smartfix_user'@'%' IDENTIFIED BY '${DB_PASSWORD}';
+
+-- Даем права ТОЛЬКО на нужную базу
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, ALTER, INDEX ON smartfix.* TO 'smartfix_user'@'%';
+
 FLUSH PRIVILEGES;
 
 DROP TABLE IF EXISTS `__efmigrationshistory`;

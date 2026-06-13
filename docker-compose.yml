@@ -9,13 +9,15 @@ services:
       MYSQL_DATABASE: ${DB_NAME}
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "3307:3306"
+    # Порты убраны для безопасности (база доступна только внутри сети Docker)
     volumes:
       - mysql_data:/var/lib/mysql
       - ./init/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_ROOT_PASSWORD}"]
+      # Используем пользователя приложения для проверки, чтобы не светить root-пароль в логах
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${DB_USER}", "-p${DB_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -31,8 +33,8 @@ services:
     dns:
       - 8.8.8.8
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=db;Database=${DB_NAME};Uid=${DB_USER};Pwd=${DB_PASSWORD};
+      ConnectionStrings__DefaultConnection: "Server=smartfix-db;Port=3306;Database=${DB_NAME};User=${DB_USER};Password=${DB_PASSWORD};"
+      ASPNETCORE_ENVIRONMENT: Development
     volumes:
       # Монтируем общую папку для аватарок (путь зависит от WORKDIR в Dockerfile бэкенда, обычно это /app)
       - ./data/uploads:/app/wwwroot/uploads
