@@ -9,7 +9,6 @@ services:
       MYSQL_DATABASE: ${DB_NAME}
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
-    # Порты убраны для безопасности (база доступна только внутри сети Docker)
     volumes:
       - mysql_data:/var/lib/mysql
       - ./init/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -21,7 +20,7 @@ services:
       timeout: 3s
       retries: 5
 
-  backend:
+  smartfix-backend:
     build:
       context: ./Backend
       dockerfile: Dockerfile
@@ -35,18 +34,19 @@ services:
       ConnectionStrings__DefaultConnection: "Server=smartfix-db;Port=3306;Database=${DB_NAME};User=${DB_USER};Password=${DB_PASSWORD};"
       ASPNETCORE_ENVIRONMENT: Development
     volumes:
-      # Монтируем общую папку для аватарок (путь зависит от WORKDIR в Dockerfile бэкенда, обычно это /app)
       - ./data/uploads:/app/wwwroot/uploads
+    networks:
+      - app-network
     depends_on:
-      db:
+      smartfix-db:
         condition: service_healthy
 
-  frontend:
+  smartfix-frontend:
     build:
       context: ./Refactor/Front
       dockerfile: Dockerfile
       args:
-      - VITE_API_URL=http://157.22.205.103:8080/api
+        - VITE_API_URL=http://157.22.205.103:8080/api
     container_name: smartfix-frontend
     restart: always
     ports:
@@ -57,11 +57,15 @@ services:
       - ./Backend/wwwroot/avatars:/usr/share/nginx/html/avatars:ro
       - ./Backend/wwwroot/services:/usr/share/nginx/html/services:ro
       - ./data/uploads:/usr/share/nginx/html/uploads:ro
+    networks:
+      - app-network
     depends_on:
-      - backend
+      - smartfix-backend
+
 networks:
   app-network:
     driver: bridge
+
 volumes:
   mysql_data:
-  static_files:  # Объявляем новый именованный volume для статических файлов
+  static_files:
