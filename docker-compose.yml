@@ -1,5 +1,5 @@
 services:
-  db:
+  smartfix-db:
     image: mysql:8.0.44
     container_name: smartfix-db
     restart: always
@@ -16,10 +16,9 @@ services:
     networks:
       - app-network
     healthcheck:
-      # Используем пользователя приложения для проверки, чтобы не светить root-пароль в логах
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${DB_USER}", "-p${DB_PASSWORD}"]
-      interval: 10s
-      timeout: 5s
+      interval: 5s
+      timeout: 3s
       retries: 5
 
   backend:
