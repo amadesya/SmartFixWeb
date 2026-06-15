@@ -178,6 +178,12 @@ public class UsersController : ControllerBase
                 // Ищем ссылку...
                 string urlToDownload = !string.IsNullOrWhiteSpace(dto.AvatarUrl) ? dto.AvatarUrl : dto.Avatar!;
 
+                if (!Uri.TryCreate(urlToDownload, UriKind.Absolute, out var uriResult) ||
+                (uriResult.Scheme != Uri.UriSchemeHttp && uriResult.Scheme != Uri.UriSchemeHttps))
+                {
+                    return BadRequest(new { message = "Указана некорректная ссылка. Она должна начинаться с http:// или https://" });
+                }
+
                 try
                 {
                     var httpClient = _httpClientFactory.CreateClient();
@@ -185,7 +191,7 @@ public class UsersController : ControllerBase
                     httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
 
                     // Читаем ТОЛЬКО заголовки (не качаем тело файла сразу)
-                    using var response = await httpClient.GetAsync(urlToDownload, HttpCompletionOption.ResponseHeadersRead);
+                    using var response = await httpClient.GetAsync(uriResult, HttpCompletionOption.ResponseHeadersRead);
 
                     if (!response.IsSuccessStatusCode)
                         return BadRequest(new { message = $"Сайт-источник заблокировал скачивание. Код: {response.StatusCode}" });
