@@ -1008,8 +1008,9 @@ export interface AnalyticsSummary {
     totalRequests: number;
     completedRequests: number;
     totalRevenue: number;
-    totalPartsCost: number; // Добавлено
-    actualProfit: number;   // Добавлено
+    totalPartsCost: number;
+    totalSalary: number;
+    actualProfit: number;
     averageCheck: number;
 }
 
@@ -1026,28 +1027,62 @@ export interface TopPerson {
     requestsCount: number;
 }
 
+async function apiFetch<T>(url: string): Promise<T> {
+    const response = await fetch(url);
+    if (!response.ok) {
+        const body = await response.text().catch(() => "");
+        throw new Error(`HTTP ${response.status}: ${response.statusText}${body ? ` — ${body.slice(0, 200)}` : ""}`);
+    }
+    return response.json();
+}
+
+export interface EmployeeKpi {
+    employeeId: number;
+    name: string;
+    baseSalary: number;
+    bonusPercentage: number;
+    bonusAmount: number;
+    totalPayout: number;
+    completedRequests: number;
+    personalRevenue: number;
+    timeBasedSalary: number;
+    hourlyRate: number;
+    hoursWorked: number;
+}
+
 export const analyticsApi = {
-    getSummary: async (): Promise<AnalyticsSummary> => {
-        const response = await fetch(`${API_URL}/analytics/summary`);
-        if (!response.ok) throw new Error("Ошибка при загрузке данных с сервера");
-        return response.json();
+    getSummary: async (from?: string, to?: string): Promise<AnalyticsSummary> => {
+        const params = new URLSearchParams();
+        if (from) params.set('from', from);
+        if (to) params.set('to', to);
+        return apiFetch(`${API_URL}/analytics/summary?${params}`);
     },
-    getChartData: async (): Promise<DailyStat[]> => {
-        const response = await fetch(`${API_URL}/analytics/charts`);
-        if (!response.ok) throw new Error("Ошибка при загрузке данных с сервера");
-        return response.json();
+    getChartData: async (from?: string, to?: string): Promise<DailyStat[]> => {
+        const params = new URLSearchParams();
+        if (from) params.set('from', from);
+        if (to) params.set('to', to);
+        return apiFetch(`${API_URL}/analytics/charts?${params}`);
     },
 
-    getTopTechnicians: async (): Promise<TopPerson[]> => {
-        const response = await fetch(`${API_URL}/analytics/top-technicians`);
-        if (!response.ok) throw new Error("Ошибка при загрузке данных с сервера");
-        return response.json();
+    getTopTechnicians: async (from?: string, to?: string): Promise<TopPerson[]> => {
+        const params = new URLSearchParams();
+        if (from) params.set('from', from);
+        if (to) params.set('to', to);
+        return apiFetch(`${API_URL}/analytics/top-technicians?${params}`);
     },
     
-    getTopClients: async (): Promise<TopPerson[]> => {
-        const response = await fetch(`${API_URL}/analytics/top-clients`);
-        if (!response.ok) throw new Error("Ошибка при загрузке данных с сервера");
-        return response.json();
+    getTopClients: async (from?: string, to?: string): Promise<TopPerson[]> => {
+        const params = new URLSearchParams();
+        if (from) params.set('from', from);
+        if (to) params.set('to', to);
+        return apiFetch(`${API_URL}/analytics/top-clients?${params}`);
+    },
+
+    getKpiSalaries: async (from?: string, to?: string): Promise<EmployeeKpi[]> => {
+        const params = new URLSearchParams();
+        if (from) params.set('from', from);
+        if (to) params.set('to', to);
+        return apiFetch(`${API_URL}/analytics/kpi-salaries?${params}`);
     }
 };
 

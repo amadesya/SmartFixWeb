@@ -140,146 +140,23 @@ public class UsersController : ControllerBase
                 user.Phone = dto.Phone;
             }
 
-            bool isNewAvatarUploaded = false;
-            string newFileName = string.Empty;
-            string uploadsFolder = Path.Combine(_env.WebRootPath, "avatars");
+            var uploadsFolder = Path.Combine(
+                _env.WebRootPath ?? Path.Combine(AppContext.BaseDirectory, "wwwroot"),
+                "avatars"
+            );
+            Directory.CreateDirectory(uploadsFolder);
 
-            if (!Directory.Exists(uploadsFolder))
+            var avatarSource = dto.AvatarUrl ?? dto.Avatar;
+            var newAvatar = await ProcessAvatarAsync(user.Avatar, dto.AvatarFile, avatarSource, uploadsFolder);
+
+            if (newAvatar != null)
             {
-                Directory.CreateDirectory(uploadsFolder);
+                DeleteAvatarFile(user.Avatar, uploadsFolder);
+                user.Avatar = newAvatar;
             }
 
-            // Вариант 1: Загрузка файла напрямую с компьютера
-            if (dto.AvatarFile != null && dto.AvatarFile.Length > 0)
-            {
-                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
-                var fileExtension = Path.GetExtension(dto.AvatarFile.FileName).ToLowerInvariant();
+            user.Avatar = ExtractRelativeAvatarPath(user.Avatar) ?? user.Avatar;
 
-                if (!allowedExtensions.Contains(fileExtension))
-                    return BadRequest(new { message = "Недопустимый тип файла. Разрешены только изображения (jpg, png, gif, webp)" });
-
-                if (dto.AvatarFile.Length > 5 * 1024 * 1024)
-                    return BadRequest(new { message = "Размер файла не должен превышать 5MB" });
-
-                newFileName = Guid.NewGuid().ToString() + fileExtension;
-                var filePath = Path.Combine(_env.WebRootPath, "avatars", newFileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await dto.AvatarFile.CopyToAsync(stream);
-                }
-                isNewAvatarUploaded = true;
-            }
-
-            // Вариант 2: Загрузка по ссылке из интернета
-
-            else if (!string.IsNullOrWhiteSpace(dto.AvatarUrl) || !string.IsNullOrWhiteSpace(dto.Avatar))
-            {
-                // Ищем ссылку...
-                string urlToDownload = !string.IsNullOrWhiteSpace(dto.AvatarUrl) ? dto.AvatarUrl : dto.Avatar!;
-
-                if (!Uri.TryCreate(urlToDownload, UriKind.Absolute, out var uriResult) ||
-                (uriResult.Scheme != Uri.UriSchemeHttp && uriResult.Scheme != Uri.UriSchemeHttps))
-                {
-                    return BadRequest(new { message = "Указана некорректная ссылка. Она должна начинаться с http:// или https://" });
-                }
-
-                try
-                {
-                    var httpClient = _httpClientFactory.CreateClient();
-                    httpClient.Timeout = TimeSpan.FromSeconds(15);
-                    httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
-
-                    // Читаем ТОЛЬКО заголовки (не качаем тело файла сразу)
-                    using var response = await httpClient.GetAsync(uriResult, HttpCompletionOption.ResponseHeadersRead);
-
-                    if (!response.IsSuccessStatusCode)
-                        return BadRequest(new { message = $"Сайт-источник заблокировал скачивание. Код: {response.StatusCode}" });
-
-                    // Проверяем размер ДО скачивания (если сервер источника отдает Content-Length)
-                    var contentLength = response.Content.Headers.ContentLength;
-                    if (contentLength.HasValue && contentLength.Value > 5 * 1024 * 1024)
-                        return BadRequest(new { message = "Размер файла по ссылке превышает 5MB" });
-                    // 1. Пытаемся получить Content-Type из заголовков ответа
-                    var contentType = response.Content.Headers.ContentType?.MediaType?.ToLower();
-
-                    // 2. Если заголовка нет, пробуем определить тип по расширению в самом URL
-                    if (string.IsNullOrEmpty(contentType))
-                    {
-                        if (urlToDownload.Contains(".jpg") || urlToDownload.Contains(".jpeg")) contentType = "image/jpeg";
-                        else if (urlToDownload.Contains(".png")) contentType = "image/png";
-                        else if (urlToDownload.Contains(".webp")) contentType = "image/webp";
-                        else if (urlToDownload.Contains(".gif")) contentType = "image/gif";
-                    }
-
-                    // 3. Объявляем словарь разрешенных типов (MIME types) и соответствующих им расширений
-                    var allowedMimeTypes = new Dictionary<string, string>
-                    {
-                        { "image/jpeg", ".jpg" }, { "image/png", ".png" },
-                        { "image/gif", ".gif" }, { "image/webp", ".webp" },
-                        { "application/octet-stream", ".jpg" }
-                    };
-
-                    // 4. Проверяем, поддерживаем ли мы полученный тип файла
-                    if (contentType == null || !allowedMimeTypes.ContainsKey(contentType))
-                        return BadRequest(new { message = $"Неподдерживаемый формат файла: {contentType ?? "неизвестно"}" });
-                    var fileExtension = allowedMimeTypes[contentType];
-                    newFileName = Guid.NewGuid().ToString() + fileExtension;
-                    var filePath = Path.Combine(_env.WebRootPath, "avatars", newFileName); // Используем _env
-
-                    // Скачиваем файл потоком прямо на жесткий диск, не забивая оперативную память
-                    using var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
-                    using var networkStream = await response.Content.ReadAsStreamAsync();
-
-                    await networkStream.CopyToAsync(fileStream);
-
-                    // Опционально: если Content-Length не было, можно проверить размер после скачивания
-                    if (fileStream.Length > 5 * 1024 * 1024)
-                    {
-                        fileStream.Close();
-                        System.IO.File.Delete(filePath); // Удаляем, если оказался слишком большим
-                        return BadRequest(new { message = "Размер скачанного файла превысил 5MB" });
-                    }
-
-                    isNewAvatarUploaded = true;
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest(new { message = $"Ошибка при скачивании по ссылке: {ex.Message}" });
-                }
-
-
-            }
-
-
-            // Если картинка успешно загружена любым из способов, удаляем старую и обновляем URL
-            if (isNewAvatarUploaded)
-            {
-                // Удаление старого аватара
-                if (!string.IsNullOrEmpty(user.Avatar))
-                {
-                    string? oldFileName = null;
-                    if (user.Avatar.Contains("/avatars/"))
-                    {
-                        oldFileName = user.Avatar.Substring(user.Avatar.LastIndexOf('/') + 1);
-                    }
-
-                    if (!string.IsNullOrEmpty(oldFileName))
-                    {
-                        var oldFilePath = Path.Combine(_env.WebRootPath, "avatars", oldFileName);
-                        if (System.IO.File.Exists(oldFilePath))
-                        {
-                            try { System.IO.File.Delete(oldFilePath); }
-                            catch (Exception ex) { Console.WriteLine($"Could not delete old avatar file: {ex.Message}"); }
-                        }
-                    }
-                }
-
-                // Сохраняем новый URL в БД
-                // var baseUrl = $"{Request.Scheme}://{Request.Host}";
-                user.Avatar = $"/avatars/{newFileName}";
-            }
-            // --- КОНЕЦ БЛОКА ОБРАБОТКИ АВАТАРА ---
             if (!string.IsNullOrWhiteSpace(dto.Password))
             {
                 user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
@@ -332,7 +209,6 @@ public class UsersController : ControllerBase
         }
     }
 
-
     [Authorize(Roles = "2")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteUser(int id)
@@ -374,119 +250,25 @@ public class UsersController : ControllerBase
             Name = dto.Name,
             Email = dto.Email,
             Phone = dto.Phone,
-            Avatar = dto.Avatar,
+            Avatar = ExtractRelativeAvatarPath(dto.Avatar) ?? dto.Avatar,
             Role = dto.Role,
             IsVerified = false,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password)
         };
 
-        // === Обработка аватара ===
-        bool isNewAvatarUploaded = false;
-        string newFileName = string.Empty;
-        string uploadsFolder = Path.Combine(_env.WebRootPath, "avatars");
+        var uploadsFolder = Path.Combine(
+            _env.WebRootPath ?? Path.Combine(AppContext.BaseDirectory, "wwwroot"),
+            "avatars"
+        );
+        Directory.CreateDirectory(uploadsFolder);
 
-        if (!Directory.Exists(uploadsFolder))
-        {
-            Directory.CreateDirectory(uploadsFolder);
-        }
+        var avatarSource = dto.AvatarUrl ?? dto.Avatar;
+        var newAvatar = await ProcessAvatarAsync(null, dto.AvatarFile, avatarSource, uploadsFolder);
 
-        // Вариант 1: Загрузка файла напрямую с компьютера
-        if (dto.AvatarFile != null && dto.AvatarFile.Length > 0)
-        {
-            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
-            var fileExtension = Path.GetExtension(dto.AvatarFile.FileName).ToLowerInvariant();
+        if (newAvatar != null)
+            user.Avatar = newAvatar;
 
-            if (!allowedExtensions.Contains(fileExtension))
-                return BadRequest(new { message = "Недопустимый тип файла. Разрешены только изображения" });
-
-            if (dto.AvatarFile.Length > 5 * 1024 * 1024)
-                return BadRequest(new { message = "Размер файла не должен превышать 5MB" });
-
-            newFileName = Guid.NewGuid().ToString() + fileExtension;
-            var filePath = Path.Combine(uploadsFolder, newFileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await dto.AvatarFile.CopyToAsync(stream);
-            }
-            isNewAvatarUploaded = true;
-        }
-        // Вариант 2: Загрузка по ссылке из интернета (только если ссылка ИЗМЕНИЛАСЬ)
-        else
-        {
-            string urlToDownload = !string.IsNullOrWhiteSpace(dto.AvatarUrl) ? dto.AvatarUrl : dto.Avatar!;
-
-            // Важно: проверяем, что ссылка не пустая И она не совпадает с текущим аватаром пользователя
-            if (!string.IsNullOrWhiteSpace(urlToDownload) && urlToDownload != user.Avatar)
-            {
-                try
-                {
-                    var httpClient = _httpClientFactory.CreateClient();
-                    httpClient.Timeout = TimeSpan.FromSeconds(15);
-                    httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
-
-                    using var response = await httpClient.GetAsync(urlToDownload, HttpCompletionOption.ResponseHeadersRead);
-
-                    if (!response.IsSuccessStatusCode)
-                        return BadRequest(new { message = $"Сайт-источник заблокировал скачивание. Код: {response.StatusCode}" });
-
-                    var contentLength = response.Content.Headers.ContentLength;
-                    if (contentLength.HasValue && contentLength.Value > 5 * 1024 * 1024)
-                        return BadRequest(new { message = "Размер файла по ссылке превышает 5MB" });
-
-                    var contentType = response.Content.Headers.ContentType?.MediaType?.ToLower();
-
-                    if (string.IsNullOrEmpty(contentType))
-                    {
-                        if (urlToDownload.Contains(".jpg") || urlToDownload.Contains(".jpeg")) contentType = "image/jpeg";
-                        else if (urlToDownload.Contains(".png")) contentType = "image/png";
-                        else if (urlToDownload.Contains(".webp")) contentType = "image/webp";
-                        else if (urlToDownload.Contains(".gif")) contentType = "image/gif";
-                    }
-
-                    var allowedMimeTypes = new Dictionary<string, string>
-            {
-                { "image/jpeg", ".jpg" }, { "image/png", ".png" },
-                { "image/gif", ".gif" }, { "image/webp", ".webp" },
-                { "application/octet-stream", ".jpg" }
-            };
-
-                    if (contentType == null || !allowedMimeTypes.ContainsKey(contentType))
-                        return BadRequest(new { message = $"Неподдерживаемый формат файла: {contentType ?? "неизвестно"}" });
-
-                    var fileExtension = allowedMimeTypes[contentType];
-                    newFileName = Guid.NewGuid().ToString() + fileExtension;
-                    var filePath = Path.Combine(uploadsFolder, newFileName);
-
-                    // Ограничиваем "using" фигурные скобками, чтобы дескриптор файла закрылся ОДОЗРЯДНО
-                    using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
-                    using (var networkStream = await response.Content.ReadAsStreamAsync())
-                    {
-                        await networkStream.CopyToAsync(fileStream);
-
-                        if (fileStream.Length > 5 * 1024 * 1024)
-                        {
-                            fileStream.Close(); // закрываем перед удалением
-                            System.IO.File.Delete(filePath);
-                            return BadRequest(new { message = "Размер скачанного файла превысил 5MB" });
-                        }
-                    }
-
-                    isNewAvatarUploaded = true;
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest(new { message = $"Ошибка при скачивании по ссылке: {ex.Message}" });
-                }
-            }
-        }
-        // Если картинка успешно загружена любым из способов, сохраняем путь в БД
-        if (isNewAvatarUploaded)
-        {
-            var baseUrl = $"{Request.Scheme}://{Request.Host}";
-            user.Avatar = $"{baseUrl}/avatars/{newFileName}";
-        }
-        // === КОНЕЦ БЛОКА ОБРАБОТКИ АВАТАРА ===
+        user.Avatar = ExtractRelativeAvatarPath(user.Avatar) ?? user.Avatar;
 
         _context.Users.Add(user);
 
@@ -515,5 +297,166 @@ public class UsersController : ControllerBase
         }
     }
 
+    private static readonly HashSet<string> AllowedExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+    private const long MaxAvatarSize = 5 * 1024 * 1024;
 
+    private async Task<string?> ProcessAvatarAsync(
+        string? currentAvatar,
+        IFormFile? avatarFile,
+        string? avatarUrl,
+        string uploadsFolder)
+    {
+        if (avatarFile is { Length: > 0 })
+            return await SaveUploadedFileAsync(avatarFile, uploadsFolder);
+
+        if (!string.IsNullOrWhiteSpace(avatarUrl))
+            return await ResolveAvatarUrlAsync(currentAvatar, avatarUrl, uploadsFolder);
+
+        return null;
+    }
+
+    private async Task<string> SaveUploadedFileAsync(IFormFile file, string uploadsFolder)
+    {
+        var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+        if (!AllowedExtensions.Contains(ext))
+            throw new InvalidOperationException("Недопустимый тип файла. Разрешены только изображения (jpg, png, gif, webp)");
+
+        if (file.Length > MaxAvatarSize)
+            throw new InvalidOperationException("Размер файла не должен превышать 5MB");
+
+        var fileName = $"{Guid.NewGuid()}{ext}";
+        var filePath = Path.Combine(uploadsFolder, fileName);
+
+        await using var stream = new FileStream(filePath, FileMode.Create);
+        await file.CopyToAsync(stream);
+
+        return $"/avatars/{fileName}";
+    }
+
+    private async Task<string?> ResolveAvatarUrlAsync(string? currentAvatar, string avatarUrl, string uploadsFolder)
+    {
+        if (ContainsLocalFilePath(avatarUrl))
+            throw new InvalidOperationException("Указан недопустимый путь к файлу");
+
+        currentAvatar = ExtractRelativeAvatarPath(currentAvatar) ?? currentAvatar;
+
+        var normalized = ExtractRelativeAvatarPath(avatarUrl);
+        if (normalized != null)
+        {
+            if (currentAvatar != null && normalized == currentAvatar)
+                return null;
+
+            return null;
+        }
+
+        return await DownloadAndSaveAvatarAsync(avatarUrl, uploadsFolder);
+    }
+
+    private async Task<string> DownloadAndSaveAvatarAsync(string url, string uploadsFolder)
+    {
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) ||
+            (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+            throw new InvalidOperationException("Указана некорректная ссылка. Она должна начинаться с http:// или https://");
+
+        var httpClient = _httpClientFactory.CreateClient();
+        httpClient.Timeout = TimeSpan.FromSeconds(15);
+        httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
+
+        using var response = await httpClient.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead);
+
+        if (!response.IsSuccessStatusCode)
+            throw new InvalidOperationException($"Сайт-источник заблокировал скачивание. Код: {response.StatusCode}");
+
+        var contentLength = response.Content.Headers.ContentLength;
+        if (contentLength.HasValue && contentLength.Value > MaxAvatarSize)
+            throw new InvalidOperationException("Размер файла по ссылке превышает 5MB");
+
+        var mimeToExtension = new Dictionary<string, string>
+        {
+            ["image/jpeg"] = ".jpg",
+            ["image/png"] = ".png",
+            ["image/gif"] = ".gif",
+            ["image/webp"] = ".webp",
+            ["application/octet-stream"] = ".jpg"
+        };
+
+        var contentType = response.Content.Headers.ContentType?.MediaType?.ToLowerInvariant()
+                          ?? InferMimeFromUrl(url);
+
+        if (contentType == null || !mimeToExtension.TryGetValue(contentType, out var ext))
+            throw new InvalidOperationException($"Неподдерживаемый формат файла: {contentType ?? "неизвестно"}");
+
+        var fileName = $"{Guid.NewGuid()}{ext}";
+        var filePath = Path.Combine(uploadsFolder, fileName);
+
+        await using var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
+        await using var networkStream = await response.Content.ReadAsStreamAsync();
+        await networkStream.CopyToAsync(fileStream);
+
+        if (fileStream.Length > MaxAvatarSize)
+        {
+            await fileStream.DisposeAsync();
+            System.IO.File.Delete(filePath);
+            throw new InvalidOperationException("Размер скачанного файла превысил 5MB");
+        }
+
+        return $"/avatars/{fileName}";
+    }
+
+    private static string? InferMimeFromUrl(string url)
+    {
+        if (url.Contains(".jpg") || url.Contains(".jpeg")) return "image/jpeg";
+        if (url.Contains(".png")) return "image/png";
+        if (url.Contains(".webp")) return "image/webp";
+        if (url.Contains(".gif")) return "image/gif";
+        return null;
+    }
+
+    private static string? ExtractRelativeAvatarPath(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            return null;
+
+        if (path.StartsWith("/avatars/", StringComparison.Ordinal))
+            return path;
+
+        if (Uri.TryCreate(path, UriKind.Absolute, out var uri) &&
+            uri.AbsolutePath.StartsWith("/avatars/", StringComparison.Ordinal))
+            return uri.AbsolutePath;
+
+        return null;
+    }
+
+    private static bool ContainsLocalFilePath(string path)
+    {
+        if (path.Length >= 3 && char.IsLetter(path[0]) && path[1] == ':' && (path[2] == '\\' || path[2] == '/'))
+            return true;
+
+        if (path.StartsWith("\\\\", StringComparison.Ordinal))
+            return true;
+
+        if (path.StartsWith("file://", StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    }
+
+    private static void DeleteAvatarFile(string? avatarPath, string uploadsFolder)
+    {
+        if (string.IsNullOrEmpty(avatarPath))
+            return;
+
+        var index = avatarPath.LastIndexOf("/avatars/", StringComparison.Ordinal);
+        if (index < 0)
+            return;
+
+        var fileName = avatarPath[(index + "/avatars/".Length)..];
+        var filePath = Path.Combine(uploadsFolder, fileName);
+
+        if (System.IO.File.Exists(filePath))
+        {
+            try { System.IO.File.Delete(filePath); }
+            catch (Exception ex) { Console.WriteLine($"Could not delete old avatar: {ex.Message}"); }
+        }
+    }
 }

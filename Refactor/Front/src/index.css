@@ -49,13 +49,17 @@
 @layer base {
 :root {
     --smartfix-darkest: #DAF1DE;
-    /* Подменяем на светлый для светлой темы */
     --smartfix-darker: #8EB69B;
     --smartfix-dark: #235347;
     --smartfix-medium: #163832;
     --smartfix-light: #0B2B26;
     --smartfix-lightest: #051F20;
-    /* Подменяем на темный */
+
+    --chart-grid: #e5e7eb;
+    --chart-axis: #a1a1aa;
+    --chart-tooltip-bg: #ffffff;
+    --chart-tooltip-border: #e5e7eb;
+    --chart-tooltip-text: #111827;
   }
 
   html.dark {
@@ -93,7 +97,12 @@
     --input: 171 43% 20%;
     --ring: 166 41% 35%;
 
-    /* Цвета для графиков/элементов из светлой части палитры (#8EB69B) */
+    --chart-grid: #374151;
+    --chart-axis: #9ca3af;
+    --chart-tooltip-bg: #1f2937;
+    --chart-tooltip-border: #374151;
+    --chart-tooltip-text: #ffffff;
+
     --chart-1: 146 22% 64%;
     --chart-2: 166 41% 23%;
 

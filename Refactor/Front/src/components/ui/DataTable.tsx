@@ -1,4 +1,5 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState, useEffect } from 'react';
+import { Pagination } from '@/components/ui/Pagination';
 
 export interface Column<T> {
     header: string;
@@ -12,6 +13,7 @@ interface DataTableProps<T> {
     isLoading: boolean;
     rowKey: (item: T) => string | number;
     emptyMessage?: string;
+    pageSize?: number;
 }
 
 function DataTable<T>({
@@ -19,8 +21,17 @@ function DataTable<T>({
     columns,
     isLoading,
     rowKey,
-    emptyMessage = "Данные не найдены"
+    emptyMessage = "Данные не найдены",
+    pageSize = 0
 }: DataTableProps<T>) {
+    const [page, setPage] = useState(1);
+    const totalPages = pageSize > 0 ? Math.max(1, Math.ceil(data.length / pageSize)) : 1;
+    const displayData = pageSize > 0 ? data.slice((page - 1) * pageSize, page * pageSize) : data;
+
+    useEffect(() => {
+        setPage(1);
+    }, [data.length]);
+
     if (isLoading) {
         return <div className="text-center text-gray-500 dark:text-smartfix-light py-12 font-medium">Загрузка...</div>;
     }
@@ -32,13 +43,11 @@ function DataTable<T>({
                     <thead className="hidden md:table-header-group bg-gray-50 dark:bg-smartfix-dark border-b border-gray-200 dark:border-smartfix-dark/50">
                         <tr className="md:table-row">
                             {columns.map((col, idx) => {
-                                // Определяем последнюю колонку (обычно это Действия)
                                 const isActions = idx === columns.length - 1;
                                 return (
                                     <th
                                         key={idx}
                                         className={`p-4 text-sm font-semibold text-gray-600 dark:text-smartfix-light ${
-                                            // Сжимаем колонку действий и выравниваем заголовок вправо
                                             isActions ? 'w-1 whitespace-nowrap md:text-right' : ''
                                             } ${col.className || ''}`}
                                     >
@@ -50,8 +59,8 @@ function DataTable<T>({
                     </thead>
 
                     <tbody className="block md:table-row-group md:divide-y divide-gray-200 dark:divide-smartfix-dark space-y-4 md:space-y-0">
-                        {data.length > 0 ? (
-                            data.map((item) => (
+                        {displayData.length > 0 ? (
+                            displayData.map((item) => (
                                 <tr
                                     key={rowKey(item)}
                                     className="block md:table-row bg-white dark:bg-transparent border border-gray-200 dark:border-none rounded-xl md:rounded-none hover:bg-gray-50 dark:hover:bg-smartfix-dark transition-colors overflow-hidden"
@@ -87,6 +96,9 @@ function DataTable<T>({
                     </tbody>
                 </table>
             </div>
+            {pageSize > 0 && (
+                <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+            )}
         </div>
     );
 }

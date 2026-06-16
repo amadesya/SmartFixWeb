@@ -1,5 +1,6 @@
 import React from 'react';
-import { TrashIcon, PencilIcon, UserIcon, ShieldCheckIcon, WrenchIcon } from '@heroicons/react/24/outline';
+import { TrashIcon, PencilIcon, ShieldCheckIcon, WrenchIcon } from '@heroicons/react/24/outline';
+import SafeAvatar from '@/components/ui/SafeAvatar';
 import { EmployeeDto } from '@/services/api'; // Убедись, что путь правильный
 
 interface EmployeeCardProps {
@@ -16,21 +17,12 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onEdit, onDelete 
 
             {/* Верхняя часть: Аватар/Иконка и Роль */}
             <div className="relative pt-8 pb-4 flex flex-col items-center justify-center bg-smartfix-lightest/10">
-                <div className="relative w-28 h-28 rounded-full border-4 border-smartfix-dark shadow-2xl overflow-hidden group-hover:border-emerald-500/30 transition-all duration-500 z-10">
-                {/* Иконка пользователя */}
-                {employee.avatar ? (
-                    <img
-                        src={employee.avatar}
-                        alt={employee.userName}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-                ) : (
-                    <div className="p-4 rounded-full bg-smartfix-dark group-hover:bg-emerald-500/10 transition-colors duration-500">
-                            <UserIcon className="w-10 h-10 text-smartfix-medium group-hover:text-emerald-500 transition-colors" />
-                    </div>
-                )}
-                </div>
-
+                <SafeAvatar
+                    src={employee.avatar}
+                    alt={employee.userName}
+                    className="relative w-28 h-28 rounded-full border-4 border-smartfix-dark shadow-2xl overflow-hidden group-hover:border-emerald-500/30 transition-all duration-500 z-10"
+                    iconClassName="bg-smartfix-dark group-hover:bg-emerald-500/10 transition-colors duration-500"
+                />
 
                 {/* Бейдж с ролью */}
                 <div className={`absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-md border backdrop-blur-md ${isMaster

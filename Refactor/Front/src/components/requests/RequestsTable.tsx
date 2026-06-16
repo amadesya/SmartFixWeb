@@ -51,6 +51,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
             isLoading={isLoading}
             rowKey={(req) => req.id}
             emptyMessage="Заявки не найдены"
+            pageSize={15}
         />
     );
 };

@@ -14,6 +14,7 @@ public class RepairRequestDto
     public DateTime CreatedAt { get; set; }
     public List<CommentDto> Comments { get; set; } = new();
     public decimal? Price { get; set; }
+    public decimal? MasterBonus { get; set; }
     public bool HasReview { get; set; }
     public int? ReviewRating { get; set; }
     public string? ReviewBody { get; set; }

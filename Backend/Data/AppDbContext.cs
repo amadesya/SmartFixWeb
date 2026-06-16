@@ -22,6 +22,7 @@ public class AppDbContext : DbContext
     public DbSet<WikiCategory> WikiCategories => Set<WikiCategory>();
     public DbSet<StockMovement> StockMovements => Set<StockMovement>();
     public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<TimeLog> TimeLogs => Set<TimeLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
 {
@@ -41,6 +42,19 @@ public class AppDbContext : DbContext
         .HasOne(e => e.User)
         .WithOne(u => u.EmployeeInfo)
         .HasForeignKey<Employee>(e => e.UserId);
+
+        modelBuilder.Entity<TimeLog>()
+            .HasOne(t => t.Employee)
+            .WithMany()
+            .HasForeignKey(t => t.EmployeeId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<TimeLog>()
+            .HasOne(t => t.RepairRequest)
+            .WithMany()
+            .HasForeignKey(t => t.RepairRequestId)
+            .OnDelete(DeleteBehavior.SetNull);
+
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<RepairServices>()

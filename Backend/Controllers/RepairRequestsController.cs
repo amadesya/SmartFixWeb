@@ -920,6 +920,19 @@ public class RepairRequestsController : ControllerBase
             }
         }
 
+        // --- ШАГ 3.5: РАСЧЁТ KPI-БОНУСА МАСТЕРА ---
+        if (request.TechnicianId != null)
+        {
+            var employee = await _db.Employees
+                .FirstOrDefaultAsync(e => e.UserId == request.TechnicianId);
+            if (employee != null)
+            {
+                var totalServicesPrice = dto.Services.Sum(s => s.Price);
+                request.MasterBonus = totalServicesPrice * (employee.BonusPercentage / 100);
+                if (request.MasterBonus < 0) request.MasterBonus = 0;
+            }
+        }
+
         request.Status = "Ready";
         request.Price = totalCostForClient;
         request.CompletedAt = DateTime.Now;
@@ -1163,6 +1176,7 @@ public class RepairRequestsController : ControllerBase
             CreatedAt = r.CreatedAt,
             Comments = MapComments(r.Comments),
             Price = r.Price,
+            MasterBonus = r.MasterBonus,
             DiscountedPrice = discountedPrice,
             IsPaid = r.IsPaid
         };
