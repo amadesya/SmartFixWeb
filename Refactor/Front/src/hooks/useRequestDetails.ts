@@ -308,6 +308,32 @@ const handleAcceptRequest = async (requestToAccept: RepairRequest) => {
         }
     };
 
+    const handleApplyBonuses = async (id: number) => {
+        if (!id || !bonusesSubtracted || bonusesSubtracted <= 0) {
+            toast.error("Укажите сумму к списанию");
+            return;
+        }
+        try {
+            const result = await repairRequestsApi.applyBonusesToRequest(id, Number(bonusesSubtracted));
+            toast.success("Бонусы списаны");
+            setSelectedRequest((prev) =>
+                prev && prev.id === id
+                    ? { ...prev, price: result.price }
+                    : prev
+            );
+            setBonusesSubtracted('');
+            if (selectedRequest?.clientId) {
+                try {
+                    const profile = await clientsApi.getProfile(selectedRequest.clientId);
+                    setClientLoyalty(profile.loyalty);
+                } catch (_) { }
+            }
+            if (refreshList) refreshList();
+        } catch (error: any) {
+            toast.error(error?.message || "Ошибка при списании бонусов");
+        }
+    };
+
     // Собираем все пропсы, которые нужны для компонента RequestDetailsModal
     const modalProps = {
         selectedRequest,
@@ -342,7 +368,9 @@ const handleAcceptRequest = async (requestToAccept: RepairRequest) => {
         cancelDeleteReq,
         bonusesSubtracted,
         setBonusesSubtracted,
-        clientLoyalty
+        clientLoyalty,
+        setClientLoyalty,
+        handleApplyBonuses
     };
 
     return {

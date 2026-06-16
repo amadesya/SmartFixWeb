@@ -9,7 +9,7 @@ import AdminControls from './AdminControls';
 import RequestInfoSection from './RequestInfoSection';
 import ReviewModal from './ReviewModal';
 import { Tabs } from '../ui/Tabs';
-import { createPayment, repairRequestsApi } from '../../services/api';
+import { createPayment, repairRequestsApi, clientsApi } from '../../services/api';
 import { useRequestDetails } from '@/hooks/useRequestDetails';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
 import toast from 'react-hot-toast';
@@ -41,7 +41,11 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = (props) => {
         requestToDelete,
         confirmDeleteRequestAction,
         cancelDeleteReq,
-        clientLoyalty
+        clientLoyalty,
+        setClientLoyalty,
+        handleApplyBonuses,
+        bonusesSubtracted,
+        setBonusesSubtracted
     } = props;
     const [request, setRequest] = useState<RepairRequest | null>(null);
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
@@ -128,13 +132,15 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = (props) => {
     const receiptPartsTotal = request?.repairParts?.reduce((sum: number, p: any) => sum + (p.priceAtTheTime ?? 0), 0) ?? 0;
     const itemsTotal = receiptServicesTotal + receiptPartsTotal;
     const discountPercent = clientLoyalty?.discountPercent ?? 0;
-    const basePrice = itemsTotal > 0
+    const dbPrice = request?.price ?? selectedRequest.price ?? 0;
+    const calculatedPrice = itemsTotal > 0
         ? Math.round(itemsTotal * (1 - discountPercent / 100))
-        : (request?.price ?? selectedRequest.price ?? 0);
+        : 0;
+    const actualPrice = dbPrice > 0 ? dbPrice : calculatedPrice;
 
     const displayedPrice = (useBonuses && clientBonusesToSubtract)
-        ? Math.max(0, basePrice - Number(clientBonusesToSubtract))
-        : basePrice;
+        ? Math.max(0, actualPrice - Number(clientBonusesToSubtract))
+        : actualPrice;
 
     return (
         <Modal
@@ -191,28 +197,100 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = (props) => {
 
                                     {useBonuses && (
                                         <div className="animate-in slide-in-from-top-2 duration-200 mt-2">
-                                            <input
-                                                type="number"
-                                                min="0"
-                                                max={Math.min(clientLoyalty.bonusPoints, basePrice)}
-                                                value={clientBonusesToSubtract}
-                                                onChange={(e) => {
-                                                    const val = Number(e.target.value);
-                                                    const maxAllowed = Math.min(clientLoyalty.bonusPoints, basePrice);
-                                                    if (val > maxAllowed) {
-                                                        setClientBonusesToSubtract(maxAllowed);
-                                                    } else {
-                                                        setClientBonusesToSubtract(val || '');
-                                                    }
-                                                }}
-                                                className="w-full p-2.5 border border-emerald-200 dark:border-emerald-800 rounded-lg bg-white dark:bg-smartfix-darker text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm"
-                                                placeholder="Количество баллов"
-                                            />
+                                            <div className="flex gap-2">
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    max={Math.min(clientLoyalty.bonusPoints, actualPrice)}
+                                                    value={clientBonusesToSubtract}
+                                                    onChange={(e) => {
+                                                        const val = Number(e.target.value);
+                                                        const maxAllowed = Math.min(clientLoyalty.bonusPoints, actualPrice);
+                                                        if (val > maxAllowed) {
+                                                            setClientBonusesToSubtract(maxAllowed);
+                                                        } else {
+                                                            setClientBonusesToSubtract(val || '');
+                                                        }
+                                                    }}
+                                                    className="flex-1 p-2.5 border border-emerald-200 dark:border-emerald-800 rounded-lg bg-white dark:bg-smartfix-darker text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm"
+                                                    placeholder="Количество баллов"
+                                                />
+                                                <button
+                                                    onClick={async () => {
+                                                        if (!selectedRequest?.id || !clientBonusesToSubtract || clientBonusesToSubtract <= 0) return;
+                                                        try {
+                                                            const result = await repairRequestsApi.applyBonusesToRequest(
+                                                                selectedRequest.id,
+                                                                Number(clientBonusesToSubtract)
+                                                            );
+                                                            toast.success("Бонусы списаны");
+                                                            setUseBonuses(false);
+                                                            setClientBonusesToSubtract('');
+                                                            if (selectedRequest.clientId) {
+                                                                const profile = await clientsApi.getProfile(selectedRequest.clientId);
+                                                                setClientLoyalty(profile.loyalty);
+                                                            }
+                                                            setRequest(prev =>
+                                                                prev && prev.id === selectedRequest.id
+                                                                    ? { ...prev, price: result.price }
+                                                                    : prev
+                                                            );
+                                                            await fetchRequest();
+                                                            refreshList();
+                                                        } catch (error: any) {
+                                                            toast.error(error?.message || "Ошибка при списании бонусов");
+                                                        }
+                                                    }}
+                                                    disabled={!clientBonusesToSubtract || clientBonusesToSubtract <= 0}
+                                                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-300 dark:disabled:bg-gray-600 text-white font-medium rounded-lg disabled:opacity-50 transition-colors text-sm whitespace-nowrap"
+                                                >
+                                                    Списать
+                                                </button>
+                                            </div>
                                             <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-2">
-                                                Итоговая стоимость будет уменьшена на указанную сумму.
+                                                Бонусы будут списаны сразу после нажатия кнопки.
                                             </p>
                                         </div>
                                     )}
+                                </div>
+                            )}
+
+                            {isStaff && !(request?.isPaid ?? selectedRequest.isPaid) && (
+                                <div className="p-4 bg-blue-50 dark:bg-smartfix-dark border border-blue-100 dark:border-blue-900/30 rounded-xl">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <label className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                                            Списать бонусы клиента (админ/мастер)
+                                        </label>
+                                        <span className="text-sm font-bold text-blue-700 dark:text-blue-300">
+                                            Доступно: {clientLoyalty?.bonusPoints || 0}
+                                        </span>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            max={clientLoyalty?.bonusPoints || 0}
+                                            placeholder="Сумма к списанию"
+                                            value={bonusesSubtracted}
+                                            onChange={(e) => setBonusesSubtracted(e.target.value ? Number(e.target.value) : '')}
+                                            className="flex-1 p-2 border border-blue-200 dark:border-blue-800 rounded-lg bg-white dark:bg-smartfix-darker text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                        />
+                                        <button
+                                            onClick={async () => {
+                                                const id = selectedRequest?.id || request?.id;
+                                                if (!id) return;
+                                                await handleApplyBonuses(id);
+                                                await fetchRequest();
+                                            }}
+                                            disabled={!bonusesSubtracted || bonusesSubtracted <= 0}
+                                            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-300 dark:disabled:bg-gray-600 text-white font-medium rounded-lg disabled:opacity-50 transition-colors text-sm whitespace-nowrap"
+                                        >
+                                            Списать
+                                        </button>
+                                    </div>
+                                    <p className="text-xs text-blue-700 dark:text-blue-300 mt-2">
+                                        Бонусы будут списаны сразу после нажатия кнопки.
+                                    </p>
                                 </div>
                             )}
 
@@ -284,32 +362,6 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = (props) => {
                                 onSave={handleUpdateRequest}
                                 onDelete={handleDeleteRequest}
                             />
-
-                            {/* Блок списания бонусов при статусе "Готово" */}
-                            {(props.newStatus === 'Ready' || props.newStatus === 'Готова') && (
-                                <div className="mt-4 p-4 bg-blue-50 dark:bg-smartfix-dark border border-blue-100 dark:border-blue-900/30 rounded-xl animate-in fade-in zoom-in duration-200">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <label className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                                            Списать бонусы клиента
-                                        </label>
-                                        <span className="text-sm font-bold text-blue-700 dark:text-blue-300">
-                                            Доступно: {clientLoyalty?.bonusPoints || 0}
-                                        </span>
-                                    </div>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        max={clientLoyalty?.bonusPoints || 0}
-                                        placeholder="Сумма к списанию"
-                                        value={props.bonusesSubtracted}
-                                        onChange={(e) => props.setBonusesSubtracted(e.target.value ? Number(e.target.value) : '')}
-                                        className="w-full p-2 border border-blue-200 dark:border-blue-800 rounded-lg bg-white dark:bg-smartfix-darker text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                                    />
-                                    <p className="text-xs text-blue-700 dark:text-blue-300 mt-2">
-                                        Укажите количество бонусов для вычета из итоговой суммы при сохранении.
-                                    </p>
-                                </div>
-                            )}
                         </div>
                     )}
                 </div>

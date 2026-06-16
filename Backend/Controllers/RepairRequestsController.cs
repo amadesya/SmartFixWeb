@@ -1091,13 +1091,16 @@ public class RepairRequestsController : ControllerBase
         return NotFound("Запчасть в заявке не найдена");
     }
 
-    [Authorize(Roles = "0")]
+    [Authorize]
     [HttpPost("{id}/apply-bonuses")]
     public async Task<IActionResult> ApplyBonuses(int id, [FromBody] ApplyBonusesDto dto)
     {
         var currentUserIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(currentUserIdStr)) return Unauthorized();
         var currentUserId = int.Parse(currentUserIdStr);
+
+        var currentUserRoleStr = User.FindFirst(ClaimTypes.Role)?.Value;
+        int.TryParse(currentUserRoleStr, out int currentUserRole);
 
         using var transaction = await _db.Database.BeginTransactionAsync();
         try
@@ -1107,7 +1110,7 @@ public class RepairRequestsController : ControllerBase
                 .FirstOrDefaultAsync(r => r.Id == id);
 
             if (request == null) return NotFound("Заявка не найдена");
-            if (request.ClientId != currentUserId) return Forbid();
+            if (request.ClientId != currentUserId && currentUserRole == 0) return Forbid();
 
             if (dto.BonusesToSubtract <= 0) return BadRequest("Неверная сумма бонусов");
             if (request.Client.BonusPoints < dto.BonusesToSubtract)
@@ -1117,9 +1120,25 @@ public class RepairRequestsController : ControllerBase
             if (dto.BonusesToSubtract > currentPrice)
                 return BadRequest("Сумма бонусов превышает стоимость ремонта");
 
-            request.Price -= dto.BonusesToSubtract;
+            // Списываем бонусы у клиента
             request.Client.BonusPoints -= dto.BonusesToSubtract;
-            request.Client.TotalSpent -= dto.BonusesToSubtract; // Корректировка потраченной суммы с учетом списанных бонусов
+            request.Price -= dto.BonusesToSubtract;
+
+            // Начисляем баллы лояльности за списанные бонусы (5% от суммы списанных бонусов)
+            request.Client.BonusPoints += dto.BonusesToSubtract * 0.05m;
+            request.Client.TotalSpent += dto.BonusesToSubtract;
+
+            // Обновляем уровень лояльности на основе TotalSpent
+            if (request.Client.TotalSpent >= 50000)
+            {
+                request.Client.LoyaltyTier = LoyaltyTier.Gold;
+                request.Client.PersonalDiscount = 15;
+            }
+            else if (request.Client.TotalSpent >= 10000)
+            {
+                request.Client.LoyaltyTier = LoyaltyTier.Silver;
+                request.Client.PersonalDiscount = 10;
+            }
 
             await _db.SaveChangesAsync();
             await transaction.CommitAsync();
