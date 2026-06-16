@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect, useCallback } from 'react';
-import { AuthContext, useAuth } from '@/components/auth/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import Header from '@/components/ui/Header';
 import { NavLinks } from '@/components/ui/NavLinks';
 import RequestsPage from './RequestsPage';

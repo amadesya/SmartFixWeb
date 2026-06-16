@@ -1,5 +1,5 @@
 import React, { useContext, useMemo } from 'react';
-import { AuthContext, useAuth } from '@/components/auth/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { Role, RequestStatus, RequestStatusLabels } from '../types';
 import { useRequestsData } from '@/hooks/useRequestsData'; 
 import { useRequestFilters } from '@/hooks/useRequestFilters'; 

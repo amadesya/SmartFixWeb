@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { AuthContext, useAuth } from '@/components/auth/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { RepairRequest, Role } from '../types';
 import Calendar from '../components/ui/Calendar';
 import Modal from '../components/ui/Modal';

@@ -41,7 +41,21 @@ public class AuthController : ControllerBase
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        return Ok(new { message = "Регистрация успешна!" });
+        var token = GenerateJwtToken(user);
+
+        return Ok(new AuthResponseDto
+        {
+            Id = user.Id,
+            Token = token,
+            Name = user.Name,
+            Email = user.Email,      
+            Role = user.Role,
+            IsVerified = user.IsVerified,
+            Phone = user.Phone,      
+            Avatar = user.Avatar,
+            PersonalDiscount = user.PersonalDiscount,
+            BonusPoints = user.BonusPoints
+        });
     }
 
     [HttpPost("login")]

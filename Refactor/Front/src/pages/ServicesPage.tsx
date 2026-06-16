@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Service, ServiceDto, Role } from '../types';
-import { AuthContext, useAuth } from '@/components/auth/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { servicesApi, clientsApi } from '../services/api';
 import ServiceModal from '../components/services/ServiceModal';
 import { PageHeader } from '@/components/ui/PageHeader';

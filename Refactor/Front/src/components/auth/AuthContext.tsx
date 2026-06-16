@@ -55,8 +55,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setUser(loggedUser);
 
             // 2. ИСПРАВЛЕНО: Железно сохраняем новые данные в память браузера
-            localStorage.setItem("smartfix_user", JSON.stringify(data));
-            localStorage.setItem("token", data.token);
+            localStorage.setItem("smartfix_user", JSON.stringify(loggedUser));
+            localStorage.setItem("token", loggedUser.token || '');
 
             return true;
         }
@@ -69,10 +69,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (data) {
             const registeredUser: User = {
                 id: data.id,
-                name: data.name,
-                email: data.email,
+                name: data.name || name,
+                email: data.email || email,
                 role: data.role,
                 isVerified: data.isVerified,
+                phone: data.phone,
                 avatar: data.avatar,
                 token: data.token
             };
@@ -80,8 +81,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setUser(registeredUser);
 
             // 3. ИСПРАВЛЕНО: Сохраняем пользователя сразу после регистрации
-            localStorage.setItem("smartfix_user", JSON.stringify(data));
-            localStorage.setItem("token", data.token);
+            localStorage.setItem("smartfix_user", JSON.stringify(registeredUser));
+            localStorage.setItem("token", registeredUser.token || '');
 
             return registeredUser;
         }
@@ -106,17 +107,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             login: loginAction,
             register: registerAction,
             logout,
-            isAuthenticated: !!user
+            isAuthenticated: !!user,
         }}>
             {children}
         </AuthContext.Provider>
     );
 };
 
-export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (context === undefined) {
-        throw new Error('useAuth must be used within an AuthProvider');
-    }
-    return context;
-};
+export default AuthProvider;

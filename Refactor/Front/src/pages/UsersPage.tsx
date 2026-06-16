@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { getUsers, createUser, updateUser, deleteUser, getAuthHeader, API_URL, clientsApi } from '../services/api';
 import { User, Role } from '../types';
-import { AuthContext, useAuth } from '@/components/auth/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { getFullAvatarUrl } from '../utils/avatarHelper';
 import { UsersStats } from '@/components/users/UsersStats';
 import UserModal from '@/components/users/UserModal';

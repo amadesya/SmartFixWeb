@@ -4,7 +4,7 @@ import { User } from '@/types';
 import { useReviews } from '@/hooks/useReviews';
 import { ReviewForm } from '@/components/reviews/ReviewsForm';
 import { ReviewItem } from '@/components/reviews/ReviewItem';
-import { useAuth } from '@/components/auth/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { PageHeader } from '@/components/ui/PageHeader';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
 

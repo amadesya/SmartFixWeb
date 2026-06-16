@@ -56,7 +56,7 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onEdit, onDelete 
 
             {/* Контент: Имя и финансовая информация */}
             <div className="p-5 flex flex-col flex-1">
-                <h3 className="text-xl font-bold text-smartfix-darker dark:text-white mb-4 group-hover:text-white dark:group-hover:text-emerald-400 transition-colors text-center">
+                <h3 className="text-xl font-bold text-smartfix-darker dark:text-white mb-4 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors text-center">
                     {employee.userName}
                 </h3>
 

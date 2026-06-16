@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Smartphone, Laptop, Monitor, Wrench, Zap, BookOpen, ArrowRight, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { API_URL, getAuthHeader } from '../services/api';
-import { useAuth } from '@/components/auth/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { Role } from '../types';
 import { WikiEditor } from '@/components/wiki/WikiEditor';
 

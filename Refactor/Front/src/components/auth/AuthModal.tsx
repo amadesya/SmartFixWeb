@@ -63,7 +63,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 const user = await register(name, email, password);
                 if (user) {
                     onClose();
-                    navigate('/requests');
+                    navigate('/requests', { replace: true });
                 } else {
                     setError('Пользователь с таким email уже существует.');
                 }
@@ -113,10 +113,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 ) : (
                     <RegisterFlow
                         register={register}
-                        onSuccess={() => setIsLoginView(true)}
-                        isAgreed={isAgreed}
-                        setIsAgreed={setIsAgreed}
-                        error={error}
+                        onSuccess={() => {
+                            onClose();
+                            navigate('/requests', { replace: true });
+                        }}
                     />
                 )}
             </div>

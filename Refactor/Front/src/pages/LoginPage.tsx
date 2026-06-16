@@ -7,7 +7,9 @@ import { useServices } from '../hooks/useServices';
 import ServiceCarouselGrid from '@/components/services/ServiceCarouselGrid';
 import { Reviews3D } from '@/components/ui/Reviews3D';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/components/auth/AuthContext';
+// ✅ Правильный импорт
+import { useAuth } from "@/hooks/useAuth";
+
 
 const LoginPage: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);

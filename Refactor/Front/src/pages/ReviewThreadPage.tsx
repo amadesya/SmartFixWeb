@@ -5,7 +5,7 @@ import { ReviewItem } from '@/components/reviews/ReviewItem';
 import { useReviews } from '@/hooks/useReviews';
 import { User, Review } from '@/types';
 import { buildTree } from '@/utils/treeHelper';
-import { useAuth } from '@/components/auth/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
 
 export const ReviewThreadPage: React.FC = () => {

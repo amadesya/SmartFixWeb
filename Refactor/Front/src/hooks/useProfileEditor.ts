@@ -1,5 +1,5 @@
-import { useState, useRef, ChangeEvent, FormEvent } from "react";
-import { useAuth } from "@/hooks/useAuth"; // Используем наш новый хук
+import { useState, useRef, useEffect, ChangeEvent, FormEvent } from "react";
+import { useAuth } from "@/hooks/useAuth";
 import { updateUser } from "../services/api";
 import { subscribeUserToPush } from "../utils/pushNotifications";
 import { User } from "@/types";
@@ -30,6 +30,18 @@ export const useProfileEditor = () => {
     password: "",
     confirmPassword: "",
   });
+
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        avatar: user.avatar || "",
+      }));
+    }
+  }, [user]);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

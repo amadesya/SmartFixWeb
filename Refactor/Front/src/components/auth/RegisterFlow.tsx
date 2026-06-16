@@ -35,7 +35,7 @@ const RegisterFlow: React.FC<RegisterFlowProps> = ({ register, onSuccess }) => {
             if (!user) {
                 setError('Пользователь с таким email уже существует.');
             } else {
-                setStep('pending_verification');
+                onSuccess();
             }
         } catch (err: any) {
             setError(err.message || 'Ошибка регистрации.');
