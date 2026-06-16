@@ -100,6 +100,7 @@ public class AnalyticsController : ControllerBase
 
         var employees = await _db.Employees
             .Include(e => e.User)
+            .Where(e => e.User.Role == 1)
             .ToListAsync();
 
         var result = employees.Select(e =>
@@ -157,6 +158,7 @@ public class AnalyticsController : ControllerBase
 
         var employees = await _db.Employees
             .Include(e => e.User)
+            .Where(e => e.User.Role == 1)
             .ToListAsync();
 
         var employeeSalaries = employees.Select(e =>
