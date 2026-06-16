@@ -1,9 +1,11 @@
 import { Marquee } from '@/components/ui/marquee';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
+import { User as UserIcon } from 'lucide-react';
 import ReviewCardDetailModal from './ReviewCardDetailModal';
 import { Review } from '@/types';
 import { reviewService } from '@/services/api';
+import { getFullAvatarUrl } from '@/utils/avatarHelper';
 
 interface ReviewCardProps {
     reviews: Review;
@@ -13,6 +15,8 @@ interface ReviewCardProps {
 
 const ReviewCard = ({ review, onClick }: { review: Review; onClick: () => void }) => {
     const { authorAvatar, authorName, authorEmail, body } = review;
+    const [imgError, setImgError] = useState(false);
+    const avatarUrl = getFullAvatarUrl(authorAvatar);
 
     return (
         <figure
@@ -24,7 +28,13 @@ const ReviewCard = ({ review, onClick }: { review: Review; onClick: () => void }
             )}
         >
             <div className="flex flex-row items-center gap-2">
-                <img className="rounded-full" width="32" height="32" alt="" src={authorAvatar || "/default-avatar.png"} />
+                {avatarUrl && !imgError ? (
+                    <img className="rounded-full" width="32" height="32" alt="" src={avatarUrl} onError={() => setImgError(true)} />
+                ) : (
+                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center shrink-0">
+                        <UserIcon size={16} className="text-gray-500" />
+                    </div>
+                )}
                 <div className="flex flex-col">
                     <figcaption className="text-sm font-medium text-black">
                         {authorName}

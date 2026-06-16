@@ -114,17 +114,23 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = (props) => {
         }
     };
 
-    const { handleAcceptRequest } = useRequestDetails(selectedRequest?.id, refreshList, user);
+    const { handleAcceptRequest: handleAcceptRequestFromHook } = useRequestDetails(selectedRequest?.id, refreshList, user);
+
+    const handleAcceptRequest = async (req: RepairRequest) => {
+        await handleAcceptRequestFromHook(req);
+        await fetchRequest();
+        closeDetailsModal();
+    };
 
     if (!selectedRequest) return null;
 
-    const currentPrice = request?.price ?? selectedRequest.price ?? 0;
-    const discountedPrice = request?.discountedPrice ?? selectedRequest.discountedPrice ?? currentPrice;
-
-    const requestStatus = String(request?.status ?? selectedRequest.status).toLowerCase();
-
-    // Используем уже вычисленную скиданную цену с бэкенда
-    const basePrice = discountedPrice;
+    const receiptServicesTotal = request?.repairServices?.reduce((sum: number, s: any) => sum + (s.priceAtTheTime ?? 0), 0) ?? 0;
+    const receiptPartsTotal = request?.repairParts?.reduce((sum: number, p: any) => sum + (p.priceAtTheTime ?? 0), 0) ?? 0;
+    const itemsTotal = receiptServicesTotal + receiptPartsTotal;
+    const discountPercent = clientLoyalty?.discountPercent ?? 0;
+    const basePrice = itemsTotal > 0
+        ? Math.round(itemsTotal * (1 - discountPercent / 100))
+        : (request?.price ?? selectedRequest.price ?? 0);
 
     const displayedPrice = (useBonuses && clientBonusesToSubtract)
         ? Math.max(0, basePrice - Number(clientBonusesToSubtract))

@@ -30,6 +30,8 @@ export const ReviewItem: React.FC<ReviewItemProps> = ({
 }) => {
     const [isReplyOpen, setIsReplyOpen] = useState(false);
     const [replyText, setReplyText] = useState('');
+    const [avatarError, setAvatarError] = useState(false);
+    const avatarUrl = getFullAvatarUrl(review.authorAvatar);
     const marginClass = depth > 3 ? "ml-1" : "ml-3 sm:ml-10";
     const [isExpanded, setIsExpanded] = useState(isDefaultExpanded || depth > 0);
     const hasReplies = review.replies && review.replies.length > 0;
@@ -54,15 +56,16 @@ export const ReviewItem: React.FC<ReviewItemProps> = ({
     return (
         <div className="flex gap-2 sm:gap-4 group animate-in slide-in-from-bottom-2 duration-300 mb-4 sm:mb-6">
             <div className="shrink-0">
-                <img
-                    src={getFullAvatarUrl(review.authorAvatar) || undefined}
-                    className="w-8 h-8 rounded-full object-cover border border-smartfix-medium/30"
-                    alt="avatar"
-                    onError={(e) => (e.currentTarget.style.display = 'none')}
-                />
-                {!review.authorAvatar && (
-                    <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-smartfix-darker flex items-center justify-center border border-gray-200 dark:border-smartfix-medium/30">
-                        <UserIcon className="w-5 h-5 text-gray-400 dark:text-smartfix-light/50" />
+                {avatarUrl && !avatarError ? (
+                    <img
+                        src={avatarUrl}
+                        className="w-8 h-8 rounded-full object-cover border border-smartfix-medium/30"
+                        alt="avatar"
+                        onError={() => setAvatarError(true)}
+                    />
+                ) : (
+                    <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-smartfix-darker flex items-center justify-center border border-gray-200 dark:border-smartfix-medium/30">
+                        <UserIcon className="w-4 h-4 text-gray-400 dark:text-smartfix-light/50" />
                     </div>
                 )}
             </div>

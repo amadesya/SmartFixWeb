@@ -33,7 +33,8 @@ export const InventoryPage = () => {
         handleSubmit,
         handleTypeSubmit,
         handleAddPurchase,
-        handleAddType
+        handleAddType,
+        loadInventory
     } = useInventory();
 
     const [historyPart, setHistoryPart] = useState<{ id: number, name: string } | null>(null);
@@ -57,7 +58,7 @@ export const InventoryPage = () => {
         try {
             await deletePart(itemToDelete);
             toast.success('Запчасть успешно списана со склада');
-            window.location.reload(); // Перезагружаем для обновления списка
+            await loadInventory();
         } catch (error: any) {
             toast.error(error.message || 'Ошибка при удалении запчасти');
         } finally {

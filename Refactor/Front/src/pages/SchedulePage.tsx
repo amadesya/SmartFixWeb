@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { AuthContext, useAuth } from '@/components/auth/AuthContext';
 import { RepairRequest, Role } from '../types';
 import Calendar from '../components/ui/Calendar';
@@ -21,22 +21,25 @@ const SchedulePage: React.FC = () => {
         modalProps
     } = useRequestDetails(undefined, refresh, user);
 
-    useEffect(() => {
-        const fetchRequests = async () => {
-            if (!user?.id) return;
+    const fetchRequests = useCallback(async () => {
+        if (!user?.id) return;
 
-            try {
-                // Если isLoading управляется внутри useRequestsData, 
-                // ручной вызов setIsLoading здесь не нужен и вызовет ошибку.
-                const data = await getTechnicianRequests(user.id, "all");
-                setRequests(data);
-            } catch (error) {
-                console.error("Failed to load technician requests:", error);
-            }
-        };
-
-        fetchRequests();
+        try {
+            const data = await getTechnicianRequests(user.id, "all");
+            setRequests(data);
+        } catch (error) {
+            console.error("Failed to load technician requests:", error);
+        }
     }, [user]);
+
+    useEffect(() => {
+        fetchRequests();
+    }, [fetchRequests]);
+
+    const handleRefresh = useCallback(async () => {
+        await refresh?.();
+        await fetchRequests();
+    }, [refresh, fetchRequests]);
 
     return (
         <div>
@@ -54,7 +57,7 @@ const SchedulePage: React.FC = () => {
                 <RequestDetailsModal
                     {...modalProps}
                     technicians={technicians}
-                    refreshList={refresh}
+                    refreshList={handleRefresh}
                     actions={{
                         submitNewComment: modalProps.submitNewComment,
                         submitUpdateComment: modalProps.submitUpdate,

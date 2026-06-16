@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
-import { X, Quote } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { X, Quote, User as UserIcon } from 'lucide-react';
 import { Review } from '@/types';
+import { getFullAvatarUrl } from '@/utils/avatarHelper';
 
 interface ReviewCardDetailModalProps {
     review: Review;
@@ -8,6 +9,8 @@ interface ReviewCardDetailModalProps {
 }
 
 const ReviewCardDetailModal: React.FC<ReviewCardDetailModalProps> = ({ review, onClose }) => {
+    const [avatarError, setAvatarError] = useState(false);
+    const avatarUrl = getFullAvatarUrl(review.authorAvatar);
     // Блокируем скролл основной страницы при открытии модалки
     useEffect(() => {
         if (review) {
@@ -47,11 +50,18 @@ const ReviewCardDetailModal: React.FC<ReviewCardDetailModalProps> = ({ review, o
                         {/* Аватарка, выходящая за пределы */}
                         <div className="relative -mt-12 mb-4">
                             <div className="inline-block p-1.5 bg-smartfix-darkest rounded-3xl shadow-xl">
-                                <img
-                                    src={review.authorAvatar || '/default-avatar.png'}
-                                    className="w-24 h-24 object-cover rounded-2xl"
-                                    alt={review.authorName}
-                                />
+                                {avatarUrl && !avatarError ? (
+                                    <img
+                                        src={avatarUrl}
+                                        className="w-24 h-24 object-cover rounded-2xl"
+                                        alt={review.authorName}
+                                        onError={() => setAvatarError(true)}
+                                    />
+                                ) : (
+                                    <div className="w-24 h-24 rounded-2xl bg-smartfix-dark flex items-center justify-center">
+                                        <UserIcon className="w-10 h-10 text-smartfix-light/50" />
+                                    </div>
+                                )}
                             </div>
                         </div>
 

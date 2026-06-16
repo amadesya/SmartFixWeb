@@ -7,9 +7,8 @@ type EditorType = ReturnType<typeof usePriceEditor>;
 export const ReceiptSummary = ({ price, editor, canEdit, discountPercent }: { price: number | null, editor: EditorType, canEdit: boolean, discountPercent?: number }) => {
     const { state, actions } = editor;
 
-    // Вычисляем цену со скидкой
     const hasDiscount = !!discountPercent && discountPercent > 0 && price !== null && price > 0;
-    const finalPrice = hasDiscount ? price! * (1 - discountPercent / 100) : price;
+    const finalPrice = price;
 
     return (
         <div className="mt-auto shrink-0 bg-gray-50 dark:bg-smartfix-dark border-t border-gray-200 dark:border-white/5 pt-4 pb-2 flex flex-col gap-4 w-full">
@@ -39,11 +38,6 @@ export const ReceiptSummary = ({ price, editor, canEdit, discountPercent }: { pr
                         ) : (
                             <div className="flex items-center gap-3 shrink-0 group">
                                 <div className="flex flex-col items-end">
-                                    {hasDiscount && (
-                                        <span className="text-gray-400 dark:text-smartfix-light/50 text-sm line-through tabular-nums leading-none mb-1">
-                                            {actions.formatPrice(price)} ₽
-                                        </span>
-                                    )}
                                     <span className={`text-emerald-600 dark:text-emerald-400 font-black tabular-nums leading-none ${finalPrice !== null && finalPrice > 999999 ? 'text-2xl' : 'text-3xl'}`}>
                                         {actions.formatPrice(finalPrice)} ₽
                                     </span>

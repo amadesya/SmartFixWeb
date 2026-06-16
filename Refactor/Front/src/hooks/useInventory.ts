@@ -149,6 +149,8 @@ export const useInventory = () => {
         handleTypeSubmit,
         handleTypeDelete,
         handleAddPurchase,
-        handleAddType
+        handleAddType,
+        loadInventory,
+        loadTypes
     };
 };

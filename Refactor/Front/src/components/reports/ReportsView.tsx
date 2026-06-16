@@ -34,6 +34,9 @@ function buildChartData(
 ): ChartPoint[] {
     if (raw.length === 0) return [];
 
+    // 1. Инициализируем revMap в самом начале, чтобы избежать ошибок области видимости
+    const revMap = new Map<string, number>();
+
     const start = parseDate(from);
     const end = parseDate(to);
     const totalDays = Math.ceil((end.getTime() - start.getTime()) / 86400000);
@@ -55,9 +58,7 @@ function buildChartData(
         return result;
     }
 
-
     // --- Backward year inference ---
-    const revMap = new Map<string, number>();
     let year = end.getFullYear();
     if (raw.length > 0) {
         const lastM = parseInt(raw[raw.length - 1].date.slice(3, 5), 10) - 1;
@@ -67,7 +68,7 @@ function buildChartData(
     for (let i = raw.length - 1; i >= 0; i--) {
         const m = parseInt(raw[i].date.slice(3, 5), 10) - 1;
         if (nextMonth >= 0 && m > nextMonth) year--;
-        // Store year+month or just year
+
         if (groupByYear) {
             const yk = year;
             const prev = revMap.get(String(yk)) ?? 0;
@@ -79,11 +80,17 @@ function buildChartData(
         nextMonth = m;
     }
 
-    // --- Yearly aggregation (> 24 months) ---
+    // --- Yearly aggregation (> 24 months / "all") ---
     if (groupByYear) {
         const keys = [...revMap.keys()].map(Number);
-        const firstY = Math.min(...keys);
+        let firstY = Math.min(...keys);
         const lastY = Math.max(...keys);
+
+        // Защита от одинокой точки на графике
+        if (firstY === lastY && !isNaN(firstY)) {
+            firstY = firstY - 1;
+        }
+
         const result: ChartPoint[] = [];
         for (let y = firstY; y <= lastY; y++) {
             result.push({ date: String(y), revenue: revMap.get(String(y)) ?? 0 });
@@ -265,27 +272,24 @@ const ReportsView: React.FC = () => {
                             <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
                             <XAxis
                                 dataKey="date"
+                                type="category" // Явно указываем, что работаем со строковыми категориями
                                 stroke="var(--chart-axis)"
                                 fontSize={12}
                                 tickLine={false}
                                 axisLine={false}
                                 interval={tickInterval}
                                 allowDataOverflow={false}
-                                        tickFormatter={(value) => {
-                                            if (!value) return '';
-                                            const dateObj = new Date(value);
-                                            // Если дата не валидна, возвращаем как есть
-                                            if (isNaN(dateObj.getTime())) return value;
-
-                                            // Если выбран режим "Всё время" (разница между датами большая), показываем только Год
-                                            // (Или если в 'date' прилетает строка только с годом, например '2026')
-                                            if (value.length === 4 || filter.dateFilter.preset === 'all') {
-                                                return dateObj.getFullYear().toString();
-                                            }
-
-                                            // Для обычного режима (год/месяц) показываем сокращенное название месяца (Май, Июн...)
-                                            return dateObj.toLocaleString('ru-RU', { month: 'short' });
-                                        }}
+                                tickFormatter={(value) => {
+                                    if (!value) return '';
+                                    // Если это уже строка года (4 цифры) или пресет "all", возвращаем как есть
+                                    if (value.length === 4 || filter.dateFilter.preset === 'all') {
+                                        return value;
+                                    }
+                                    // В остальных случаях, если это дата, можно оставить форматирование или вернуть значение
+                                    const dateObj = new Date(value);
+                                    if (isNaN(dateObj.getTime())) return value;
+                                    return dateObj.toLocaleString('ru-RU', { month: 'short' });
+                                }}
                             />
                             <YAxis
                                 stroke="var(--chart-axis)"
@@ -300,9 +304,12 @@ const ReportsView: React.FC = () => {
                                 itemStyle={{ color: 'var(--chart-tooltip-text)' }}
                                 labelStyle={{ color: 'var(--chart-tooltip-text)', opacity: 0.7 }}
                                 labelFormatter={(label) => {
+                                    // Если это год, выводим красивую подпись
+                                    if (label?.length === 4 || filter.dateFilter.preset === 'all') {
+                                        return `Год: ${label}`;
+                                    }
                                     const dateObj = new Date(label);
                                     if (isNaN(dateObj.getTime())) return label;
-                                    if (filter.dateFilter.preset === 'all') return `Год: ${dateObj.getFullYear()}`;
                                     return dateObj.toLocaleString('ru-RU', { month: 'long', year: 'numeric' });
                                 }}
                                 formatter={(value) => [`${(value ?? 0).toLocaleString('ru-RU')} ₽`, "Выручка"]}
