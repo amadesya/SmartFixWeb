@@ -15,6 +15,22 @@ const LoginPage: React.FC = () => {
     const { isAuthenticated, isLoading } = useAuth();
     const navigate = useNavigate();
 
+    // Принудительно светлая тема на странице входа
+    useEffect(() => {
+        const root = document.documentElement;
+        const wasDark = root.classList.contains('dark');
+        root.classList.remove('dark');
+        root.classList.add('light');
+        return () => {
+            // Восстанавливаем тему только если пользователь уходит на защищённые роуты
+            // (на случай если logout не был вызван)
+            if (wasDark) {
+                root.classList.remove('light');
+                root.classList.add('dark');
+            }
+        };
+    }, []);
+
     useEffect(() => {
         // Если загрузка из памяти закончилась И пользователь авторизован
         if (!isLoading && isAuthenticated) {

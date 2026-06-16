@@ -25,9 +25,9 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onEdit, onDelete 
                 />
 
                 {/* Бейдж с ролью */}
-                <div className={`absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-md border backdrop-blur-md ${isMaster
-                        ? 'bg-blue-900/40 border-blue-500/20 text-blue-300'
-                        : 'bg-green-900/40 border-green-500/20 text-green-300'
+                <div className={`absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-md border backdrop-blur-md transition-colors ${isMaster
+                        ? 'bg-blue-100/80 dark:bg-blue-900/40 border-blue-300 dark:border-blue-500/20 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800/60 hover:text-blue-900 dark:hover:text-blue-100'
+                        : 'bg-green-100/80 dark:bg-green-900/40 border-green-300 dark:border-green-500/20 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800/60 hover:text-green-900 dark:hover:text-green-100'
                     }`}>
                     {isMaster ? <WrenchIcon className="w-3 h-3" /> : <ShieldCheckIcon className="w-3 h-3" />}
                     <span className="text-[10px] font-bold uppercase tracking-widest">

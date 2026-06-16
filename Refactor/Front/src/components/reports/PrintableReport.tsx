@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { RepairRequest, RequestStatus } from "@/types";
 import { analyticsApi, AnalyticsSummary } from "@/services/api";
+import { formatCurrency } from "@/lib/utils";
 
 interface Props {
     requests: RepairRequest[];
@@ -67,7 +68,7 @@ export const PrintableReport: React.FC<Props> = ({ requests, statusLabels }) => 
                                 {new Date(req.createdAt).toLocaleDateString('ru-RU')}
                             </td>
                             <td className="border border-black p-2">
-                                {req.price ? `${req.price.toLocaleString('ru-RU')} ₽` : '-'}
+                                {req.price ? formatCurrency(req.price, 2) : '-'}
                             </td>
                         </tr>
                     ))}
@@ -79,7 +80,7 @@ export const PrintableReport: React.FC<Props> = ({ requests, statusLabels }) => 
                         </th>
                         {/* Используем атрибут colSpan={5} вместо класса */}
                         <th colSpan={5} className="border border-black p-2 text-center">
-                            {`${summary?.totalRevenue?.toLocaleString('ru-RU')} ₽`}
+                            {summary?.totalRevenue ? formatCurrency(summary.totalRevenue, 2) : '-'}
                         </th>
                     </tr>
                 </thead>

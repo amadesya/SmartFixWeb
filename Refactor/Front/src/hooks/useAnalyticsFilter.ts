@@ -59,9 +59,11 @@ function getPresetRange(preset: PresetId): { from: string; to: string } {
         case "year": {
             return { from: `${y}-01-01`, to: `${y + 1}-01-01` };
         }
-        // Здесь мы исправили 'today()' на 'tomorrow()', чтобы захватывать сегодняшний день целиком
         default: {
-            return { from: "2000-01-01", to: tomorrow() };
+            const d = new Date();
+            d.setFullYear(d.getFullYear() - 2);
+            const from = `${d.getFullYear()}-01-01`;
+            return { from, to: tomorrow() };
         }
     }
 }

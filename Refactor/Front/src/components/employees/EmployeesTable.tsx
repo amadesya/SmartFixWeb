@@ -22,9 +22,9 @@ const EmployeesTable: React.FC<EmployeesTableProps> = ({ employees, onDelete, on
         {
             header: 'Роль',
             render: (emp) => (
-                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${emp.userRole === 1
-                    ? 'bg-blue-900/50 text-blue-300'
-                    : 'bg-green-900/50 text-green-300'
+                <span className={`px-2 py-1 text-xs font-semibold rounded-full transition-colors cursor-default ${emp.userRole === 1
+                    ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800/70 hover:text-blue-900 dark:hover:text-blue-100'
+                    : 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800/70 hover:text-green-900 dark:hover:text-green-100'
                     }`}>
                     {emp.userRole === 1 ? 'Мастер' : 'Админ'}
                 </span>

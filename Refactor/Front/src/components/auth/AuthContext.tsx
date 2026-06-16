@@ -91,6 +91,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const logout = () => {
         localStorage.removeItem("smartfix_user");
         localStorage.removeItem("token");
+        // Сбрасываем тему на светлую при выходе — экран авторизации всегда светлый
+        localStorage.setItem('theme', 'light');
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
         setUser(null);
     };
 

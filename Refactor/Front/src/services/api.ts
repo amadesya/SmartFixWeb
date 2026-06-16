@@ -1005,7 +1005,7 @@ export const repairRequestsApi = {
 };
 
 export interface AnalyticsSummary {
-    totalRequests: number;
+    newRequests: number;
     completedRequests: number;
     totalRevenue: number;
     totalPartsCost: number;
@@ -1057,10 +1057,11 @@ export const analyticsApi = {
         if (to) params.set('to', to);
         return apiFetch(`${API_URL}/analytics/summary?${params}`);
     },
-    getChartData: async (from?: string, to?: string): Promise<DailyStat[]> => {
+    getChartData: async (from?: string, to?: string, groupBy?: string): Promise<DailyStat[]> => {
         const params = new URLSearchParams();
         if (from) params.set('from', from);
         if (to) params.set('to', to);
+        if (groupBy) params.set('groupBy', groupBy);
         return apiFetch(`${API_URL}/analytics/charts?${params}`);
     },
 

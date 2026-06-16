@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Clock, Wallet, Coins, Percent, CheckCircle, User } from 'lucide-react';
 import { Pagination } from '@/components/ui/Pagination';
 import type { EmployeeKpi, EmployeeDto } from '@/services/api';
+import { formatCurrency } from '@/lib/utils';
 
 interface EmployeeSalaryTableProps {
   employees: EmployeeKpi[];
@@ -33,9 +34,6 @@ function calculateEmployeeSalary(salary: number, bonusPercent: number, orderCoun
   };
 }
 
-function formatCurrency(value: number): string {
-  return `${Math.round(value).toLocaleString('ru-RU')} ₽`;
-}
 
 export function EmployeeSalaryTable({ employees, employeeProfiles = [] }: EmployeeSalaryTableProps) {
   const pageSize = 15;

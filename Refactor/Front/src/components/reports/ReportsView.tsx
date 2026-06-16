@@ -5,13 +5,14 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tool
 import { useAnalyticsFilter } from '@/hooks/useAnalyticsFilter';
 import AnalyticsFilter from '@/components/reports/AnalyticsFilter';
 import { EmployeeSalaryTable } from '@/components/reports/EmployeeSalaryTable';
+import { formatCurrency, formatCompactCurrency } from '@/lib/utils';
 
 interface ChartPoint {
     date: string;
     revenue: number;
 }
 
-const MONTH_LABELS = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'];
+const MONTH_LABELS_RU = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'];
 
 function parseDate(str: string): Date {
     const [y, m, d] = str.split('-').map(Number);
@@ -22,98 +23,62 @@ function pad2(n: number): string {
     return String(n).padStart(2, '0');
 }
 
-function formatDM(d: Date): string {
-    return `${pad2(d.getDate())}.${pad2(d.getMonth() + 1)}`;
+type GroupBy = 'day' | 'month' | 'year';
+
+function detectGroupBy(from: string, to: string): GroupBy {
+    const f = parseDate(from);
+    const t = parseDate(to);
+    const days = (t.getTime() - f.getTime()) / 86400000;
+    if (days > 365) return 'year';
+    if (days > 90) return 'month';
+    return 'day';
 }
 
 function buildChartData(
     raw: DailyStat[],
     from: string,
     to: string,
-    preset?: string,
+    groupBy: GroupBy,
 ): ChartPoint[] {
-    if (raw.length === 0) return [];
-
-    // 1. Инициализируем revMap в самом начале, чтобы избежать ошибок области видимости
-    const revMap = new Map<string, number>();
-
     const start = parseDate(from);
     const end = parseDate(to);
-    const totalDays = Math.ceil((end.getTime() - start.getTime()) / 86400000);
-    const totalMonths = (end.getFullYear() - start.getFullYear()) * 12
-        + (end.getMonth() - start.getMonth());
-    const isAllTime = preset === "all";
-    const groupByYear = isAllTime || totalMonths > 24;
-    const groupByMonth = totalDays > 90 && !groupByYear;
+    const lookup = new Map(raw.map(d => [d.date, d.revenue]));
 
-    // --- Daily (≤ 90 days) ---
-    if (!groupByMonth && !groupByYear) {
-        const lookup = new Map(raw.map(d => [d.date, d.revenue]));
+    if (groupBy === 'day') {
         const result: ChartPoint[] = [];
         const cur = new Date(start);
         while (cur < end) {
-            result.push({ date: formatDM(cur), revenue: lookup.get(formatDM(cur)) ?? 0 });
+            const key = `${cur.getFullYear()}-${pad2(cur.getMonth() + 1)}-${pad2(cur.getDate())}`;
+            result.push({ date: key, revenue: lookup.get(key) ?? 0 });
             cur.setDate(cur.getDate() + 1);
         }
         return result;
     }
 
-    // --- Backward year inference ---
-    let year = end.getFullYear();
-    if (raw.length > 0) {
-        const lastM = parseInt(raw[raw.length - 1].date.slice(3, 5), 10) - 1;
-        if (lastM > end.getMonth()) year--;
-    }
-    let nextMonth = -1;
-    for (let i = raw.length - 1; i >= 0; i--) {
-        const m = parseInt(raw[i].date.slice(3, 5), 10) - 1;
-        if (nextMonth >= 0 && m > nextMonth) year--;
-
-        if (groupByYear) {
-            const yk = year;
-            const prev = revMap.get(String(yk)) ?? 0;
-            revMap.set(String(yk), prev + raw[i].revenue);
-        } else {
-            const key = `${year}-${pad2(m + 1)}`;
-            revMap.set(key, (revMap.get(key) ?? 0) + raw[i].revenue);
-        }
-        nextMonth = m;
-    }
-
-    // --- Yearly aggregation (> 24 months / "all") ---
-    if (groupByYear) {
-        const keys = [...revMap.keys()].map(Number);
-        let firstY = Math.min(...keys);
-        const lastY = Math.max(...keys);
-
-        // Защита от одинокой точки на графике
-        if (firstY === lastY && !isNaN(firstY)) {
-            firstY = firstY - 1;
-        }
-
+    if (groupBy === 'year') {
+        const firstY = start.getFullYear();
+        const lastY = end.getFullYear();
         const result: ChartPoint[] = [];
         for (let y = firstY; y <= lastY; y++) {
-            result.push({ date: String(y), revenue: revMap.get(String(y)) ?? 0 });
+            const key = String(y);
+            result.push({ date: key, revenue: lookup.get(key) ?? 0 });
         }
         return result;
     }
 
-    // --- Monthly aggregation (91 days–24 months) ---
-    const monthKeys = [...revMap.keys()].sort();
-    const firstKey = monthKeys[0];
-    const [fy, fm] = firstKey.split('-').map(Number);
-    const monthsSpan = (end.getFullYear() - fy) * 12 + (end.getMonth() - (fm - 1));
-    const showYear = monthsSpan > 12;
-
+    // month
+    const totalMonths = (end.getFullYear() - start.getFullYear()) * 12
+        + (end.getMonth() - start.getMonth());
+    const showYear = totalMonths > 12;
     const result: ChartPoint[] = [];
-    const cur = new Date(fy, fm - 1, 1);
+    const cur = new Date(start.getFullYear(), start.getMonth(), 1);
     const endMonth = new Date(end.getFullYear(), end.getMonth(), 1);
     while (cur < endMonth) {
         const key = `${cur.getFullYear()}-${pad2(cur.getMonth() + 1)}`;
         const label = showYear
-            ? `${MONTH_LABELS[cur.getMonth()]} ${cur.getFullYear()}`
-            : MONTH_LABELS[cur.getMonth()];
-        result.push({ date: label, revenue: revMap.get(key) ?? 0 });
+            ? `${MONTH_LABELS_RU[cur.getMonth()]} ${cur.getFullYear()}`
+            : MONTH_LABELS_RU[cur.getMonth()];
+        result.push({ date: label, revenue: lookup.get(key) ?? 0 });
         cur.setMonth(cur.getMonth() + 1);
     }
     return result;
@@ -130,9 +95,11 @@ const ReportsView: React.FC = () => {
     const fetchAnalytics = useCallback(async (from: string, to: string) => {
         setLoading(true);
         try {
+            const groupBy = detectGroupBy(from, to);
+
             const [summaryData, chartsData, techsData, clientsData, kpiData, empData] = await Promise.all([
                 analyticsApi.getSummary(from, to),
-                analyticsApi.getChartData(from, to),
+                analyticsApi.getChartData(from, to, groupBy),
                 analyticsApi.getTopTechnicians(from, to),
                 analyticsApi.getTopClients(from, to),
                 analyticsApi.getKpiSalaries(from, to),
@@ -183,12 +150,16 @@ const ReportsView: React.FC = () => {
         }, 0);
     }, [kpiSalaries, employeeProfiles]);
 
+    const groupBy = useMemo(() => detectGroupBy(
+        filter.dateFilter.from, filter.dateFilter.to
+    ), [filter.dateFilter.from, filter.dateFilter.to]);
+
     const processedChartData = useMemo(() => buildChartData(
         chartData,
         filter.dateFilter.from,
         filter.dateFilter.to,
-        filter.dateFilter.preset ?? undefined,
-    ), [chartData, filter.dateFilter.from, filter.dateFilter.to, filter.dateFilter.preset]);
+        groupBy,
+    ), [chartData, filter.dateFilter.from, filter.dateFilter.to, groupBy]);
 
     const tickInterval = useMemo(() => {
         const len = processedChartData.length;
@@ -223,32 +194,32 @@ const ReportsView: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-white dark:bg-smartfix-dark/30 p-6 rounded-xl border border-gray-200 dark:border-smartfix-medium/30 shadow-sm flex flex-col justify-center transition-colors">
-                    <p className="text-sm font-medium text-gray-500 dark:text-smartfix-light/70 mb-2">Всего заявок</p>
-                    <p className="text-3xl font-bold text-gray-900 dark:text-white">{summary.totalRequests}</p>
+                    <p className="text-sm font-medium text-gray-500 dark:text-smartfix-light/70 mb-2">Поступившие</p>
+                    <p className="text-3xl font-bold text-gray-900 dark:text-white">{summary.newRequests}</p>
                 </div>
                 <div className="bg-white dark:bg-smartfix-dark/30 p-6 rounded-xl border border-gray-200 dark:border-smartfix-medium/30 shadow-sm flex flex-col justify-center transition-colors">
-                    <p className="text-sm font-medium text-gray-500 dark:text-smartfix-light/70 mb-2">Выполнено</p>
+                    <p className="text-sm font-medium text-gray-500 dark:text-smartfix-light/70 mb-2">Завершённые</p>
                     <p className="text-3xl font-bold text-gray-900 dark:text-white">{summary.completedRequests}</p>
                 </div>
                 <div className="bg-white dark:bg-smartfix-dark/30 p-6 rounded-xl border border-gray-200 dark:border-smartfix-medium/30 shadow-sm flex flex-col justify-center transition-colors">
                     <p className="text-sm font-medium text-gray-500 dark:text-smartfix-light/70 mb-2">Общая выручка</p>
-                    <p className="text-3xl font-bold text-emerald-600 dark:text-[#00FF88]">{summary.totalRevenue.toLocaleString('ru-RU')} ₽</p>
+                    <p className="text-3xl font-bold text-emerald-600 dark:text-[#00FF88]">{formatCurrency(summary.totalRevenue, 0)}</p>
                 </div>
                 <div className="bg-white dark:bg-smartfix-dark/30 p-6 rounded-xl border border-gray-200 dark:border-smartfix-medium/30 shadow-sm flex flex-col justify-center transition-colors">
                     <p className="text-sm font-medium text-gray-500 dark:text-smartfix-light/70 mb-2">Средний чек</p>
-                    <p className="text-3xl font-bold text-gray-900 dark:text-white">{summary.averageCheck.toLocaleString('ru-RU')} ₽</p>
+                    <p className="text-3xl font-bold text-gray-900 dark:text-white">{formatCurrency(summary.averageCheck, 2)}</p>
                 </div>
                 <div className="bg-white dark:bg-smartfix-dark/30 p-6 rounded-xl border border-gray-200 dark:border-smartfix-medium/30 shadow-sm flex flex-col justify-center transition-colors">
                     <p className="text-sm font-medium text-gray-500 dark:text-smartfix-light/70 mb-2">Затраты на мат-лы</p>
-                    <p className="text-3xl font-bold text-red-600 dark:text-red-400">{summary.totalPartsCost.toLocaleString()} ₽</p>
+                    <p className="text-3xl font-bold text-red-600 dark:text-red-400">{formatCurrency(summary.totalPartsCost, 0)}</p>
                 </div>
                 <div className="bg-white dark:bg-smartfix-dark/30 p-6 rounded-xl border border-gray-200 dark:border-smartfix-medium/30 shadow-sm flex flex-col justify-center transition-colors">
                     <p className="text-sm font-medium text-gray-500 dark:text-smartfix-light/70 mb-2">Зарплаты</p>
-                    <p className="text-3xl font-bold text-gray-900 dark:text-white">{Math.round(computedTotalSalary).toLocaleString('ru-RU')} ₽</p>
+                    <p className="text-3xl font-bold text-gray-900 dark:text-white">{formatCurrency(computedTotalSalary, 0)}</p>
                 </div>
                 <div className="bg-white dark:bg-smartfix-dark/30 p-6 rounded-xl border border-gray-200 dark:border-smartfix-medium/30 shadow-sm flex flex-col justify-center transition-colors">
                     <p className="text-sm font-medium text-gray-500 dark:text-smartfix-light/70 mb-2">Чистая прибыль</p>
-                    <p className="text-3xl font-bold text-emerald-600 dark:text-[#00FF88]">{netProfit.toLocaleString()} ₽</p>
+                    <p className="text-3xl font-bold text-emerald-600 dark:text-[#00FF88]">{formatCurrency(netProfit, 0)}</p>
                 </div>
             </div>
 
@@ -281,14 +252,14 @@ const ReportsView: React.FC = () => {
                                 allowDataOverflow={false}
                                 tickFormatter={(value) => {
                                     if (!value) return '';
-                                    // Если это уже строка года (4 цифры) или пресет "all", возвращаем как есть
-                                    if (value.length === 4 || filter.dateFilter.preset === 'all') {
-                                        return value;
+                                    // Год (4 цифры) или название месяца (кириллица)
+                                    if (/^\d{4}$/.test(value) || /^[А-Яа-я]/.test(value)) return value;
+                                    // ISO дата (yyyy-MM-dd) → "dd.MM"
+                                    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+                                        const parts = value.split('-');
+                                        return `${parts[2]}.${parts[1]}`;
                                     }
-                                    // В остальных случаях, если это дата, можно оставить форматирование или вернуть значение
-                                    const dateObj = new Date(value);
-                                    if (isNaN(dateObj.getTime())) return value;
-                                    return dateObj.toLocaleString('ru-RU', { month: 'short' });
+                                    return value;
                                 }}
                             />
                             <YAxis
@@ -296,23 +267,30 @@ const ReportsView: React.FC = () => {
                                 fontSize={12}
                                 tickLine={false}
                                 axisLine={false}
-                                domain={[0, 'auto']}
-                                tickFormatter={(value) => `${value} ₽`}
+                                domain={[0, (dataMax: number) => dataMax > 0 ? Math.ceil(dataMax * 1.15 / 1000) * 1000 : 1000]}
+                                tickFormatter={(value: number) => formatCompactCurrency(value)}
                             />
                             <Tooltip
                                 contentStyle={{ backgroundColor: 'var(--chart-tooltip-bg)', border: '1px solid var(--chart-tooltip-border)', borderRadius: '8px' }}
                                 itemStyle={{ color: 'var(--chart-tooltip-text)' }}
                                 labelStyle={{ color: 'var(--chart-tooltip-text)', opacity: 0.7 }}
                                 labelFormatter={(label) => {
-                                    // Если это год, выводим красивую подпись
-                                    if (label?.length === 4 || filter.dateFilter.preset === 'all') {
-                                        return `Год: ${label}`;
+                                    if (!label) return '';
+                                    // Год (4 цифры)
+                                    if (/^\d{4}$/.test(label)) return `Год: ${label}`;
+                                    // Название месяца (кириллица) — оставляем как есть
+                                    if (/^[А-Яа-я]/.test(label)) return label;
+                                    // ISO дата (yyyy-MM-dd) → "13 мая 2026 г."
+                                    if (/^\d{4}-\d{2}-\d{2}$/.test(label)) {
+                                        const [y, m, d] = label.split('-').map(Number);
+                                        const date = new Date(y, m - 1, d);
+                                        return date.toLocaleString('ru-RU', {
+                                            day: 'numeric', month: 'long', year: 'numeric'
+                                        });
                                     }
-                                    const dateObj = new Date(label);
-                                    if (isNaN(dateObj.getTime())) return label;
-                                    return dateObj.toLocaleString('ru-RU', { month: 'long', year: 'numeric' });
+                                    return label;
                                 }}
-                                formatter={(value) => [`${(value ?? 0).toLocaleString('ru-RU')} ₽`, "Выручка"]}
+                                formatter={(value) => [formatCurrency(value as number, 2), "Выручка"]}
                             />
                             <Area
                                 type="monotone"
@@ -351,9 +329,9 @@ const ReportsView: React.FC = () => {
                                         <p className="text-xs text-gray-500 dark:text-gray-400">{tech.requestsCount} выполнено</p>
                                     </div>
                                 </div>
-                                <div className="text-right shrink-0 ml-3">
-                                    <p className="text-sm font-black text-emerald-500">{tech.revenue.toLocaleString('ru-RU')} ₽</p>
-                                </div>
+                <div className="text-right shrink-0 ml-3">
+                                        <p className="text-sm font-black text-emerald-500">{formatCurrency(tech.revenue, 0)}</p>
+                                    </div>
                             </div>
                         ))}
                     </div>
@@ -381,7 +359,7 @@ const ReportsView: React.FC = () => {
                                     </div>
                                 </div>
                                 <div className="text-right shrink-0 ml-3">
-                                    <p className="text-sm font-black text-purple-500">{client.revenue.toLocaleString('ru-RU')} ₽</p>
+                                    <p className="text-sm font-black text-purple-500">{formatCurrency(client.revenue, 0)}</p>
                                 </div>
                             </div>
                         ))}

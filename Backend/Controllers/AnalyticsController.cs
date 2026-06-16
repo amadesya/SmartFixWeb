@@ -23,14 +23,16 @@ public class AnalyticsController : ControllerBase
     {
         var (startDate, endDate) = GetDateRange(from, to);
 
-        var totalRequests = await _db.RepairRequests
-            .CountAsync(r => r.CreatedAt >= startDate && r.CreatedAt < endDate);
-
-        var completedStats = await _db.RepairRequests
+        var baseQuery = _db.RepairRequests
             .Where(r => r.CompletedAt.HasValue
                      && r.CompletedAt >= startDate
                      && r.CompletedAt < endDate
-                     && (r.Status == "Ready" || r.Status == "Closed"))
+                     && (r.Status == "Ready" || r.Status == "Closed"));
+
+        var newRequests = await _db.RepairRequests
+            .CountAsync(r => r.CreatedAt >= startDate && r.CreatedAt < endDate);
+
+        var completedStats = await baseQuery
             .GroupBy(r => 1)
             .Select(g => new
             {
@@ -44,18 +46,14 @@ public class AnalyticsController : ControllerBase
             .Where(t => t.Date >= startDate && t.Date < endDate)
             .SumAsync(t => t.HoursWorked * t.Employee.HourlyRate);
 
-        var totalMasterBonuses = await _db.RepairRequests
-            .Where(r => r.CompletedAt.HasValue
-                     && r.CompletedAt >= startDate
-                     && r.CompletedAt < endDate
-                     && (r.Status == "Ready" || r.Status == "Closed"))
+        var totalMasterBonuses = await baseQuery
             .SumAsync(r => r.MasterBonus ?? 0);
 
         if (completedStats == null)
         {
             return Ok(new AnalyticsSummaryDto
             {
-                TotalRequests = totalRequests,
+                NewRequests = newRequests,
                 TotalSalary = totalSalary,
                 TotalMasterBonuses = totalMasterBonuses,
             });
@@ -63,7 +61,7 @@ public class AnalyticsController : ControllerBase
 
         return Ok(new AnalyticsSummaryDto
         {
-            TotalRequests = totalRequests,
+            NewRequests = newRequests,
             CompletedRequests = completedStats.CompletedCount,
             TotalRevenue = completedStats.TotalRevenue,
             TotalPartsCost = completedStats.TotalPartsCost,
@@ -199,31 +197,67 @@ public class AnalyticsController : ControllerBase
 
     [HttpGet("charts")]
     public async Task<ActionResult<List<DailyStatDto>>> GetChartData(
-        [FromQuery] string? from, [FromQuery] string? to)
+        [FromQuery] string? from, [FromQuery] string? to,
+        [FromQuery] string groupBy = "day")
     {
         var (startDate, endDate) = GetDateRange(from, to);
 
-        var rawStats = await _db.RepairRequests
+        var filtered = _db.RepairRequests
             .Where(r => r.CompletedAt.HasValue
                      && r.CompletedAt >= startDate
                      && r.CompletedAt < endDate
-                     && (r.Status == "Ready" || r.Status == "Closed"))
-            .GroupBy(r => r.CompletedAt.Value.Date)
-            .Select(g => new
-            {
-                RawDate = g.Key,
-                Revenue = g.Sum(r => r.Price ?? 0),
-                Count = g.Count(),
-            })
-            .OrderBy(s => s.RawDate)
-            .ToListAsync();
+                     && (r.Status == "Ready" || r.Status == "Closed"));
 
-        var stats = rawStats.Select(s => new DailyStatDto
+        List<DailyStatDto> stats;
+
+        switch (groupBy)
         {
-            Date = s.RawDate.ToString("dd.MM"),
-            Revenue = s.Revenue,
-            Count = s.Count,
-        }).ToList();
+            case "year":
+            {
+                var grouped = await filtered
+                    .GroupBy(r => r.CompletedAt.Value.Year)
+                    .Select(g => new { Year = g.Key, Revenue = g.Sum(r => r.Price ?? 0), Count = g.Count() })
+                    .OrderBy(s => s.Year)
+                    .ToListAsync();
+                stats = grouped.Select(g => new DailyStatDto
+                {
+                    Date = g.Year.ToString(),
+                    Revenue = g.Revenue,
+                    Count = g.Count,
+                }).ToList();
+                break;
+            }
+            case "month":
+            {
+                var grouped = await filtered
+                    .GroupBy(r => new { r.CompletedAt.Value.Year, r.CompletedAt.Value.Month })
+                    .Select(g => new { g.Key.Year, g.Key.Month, Revenue = g.Sum(r => r.Price ?? 0), Count = g.Count() })
+                    .OrderBy(s => s.Year).ThenBy(s => s.Month)
+                    .ToListAsync();
+                stats = grouped.Select(g => new DailyStatDto
+                {
+                    Date = $"{g.Year:D4}-{g.Month:D2}",
+                    Revenue = g.Revenue,
+                    Count = g.Count,
+                }).ToList();
+                break;
+            }
+            default:
+            {
+                var grouped = await filtered
+                    .GroupBy(r => r.CompletedAt.Value.Date)
+                    .Select(g => new { Date = g.Key, Revenue = g.Sum(r => r.Price ?? 0), Count = g.Count() })
+                    .OrderBy(s => s.Date)
+                    .ToListAsync();
+                stats = grouped.Select(g => new DailyStatDto
+                {
+                    Date = g.Date.ToString("yyyy-MM-dd"),
+                    Revenue = g.Revenue,
+                    Count = g.Count,
+                }).ToList();
+                break;
+            }
+        }
 
         return Ok(stats);
     }
