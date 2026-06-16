@@ -23,6 +23,24 @@
     background: #334155;
   }
 
+  /* Скроллбар для календарных ячеек */
+  .calendar-scrollbar::-webkit-scrollbar {
+    width: 3px;
+  }
+
+  .calendar-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .calendar-scrollbar::-webkit-scrollbar-thumb {
+    background: #235347;
+    border-radius: 10px;
+  }
+
+  .calendar-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #163832;
+  }
+
   /* Скрыть скроллбар для вкладок */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
