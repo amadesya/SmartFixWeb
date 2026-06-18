@@ -189,101 +189,103 @@
 }
 
 @layer components {
+  /* --- Кнопки и интерактивные элементы --- */
+
   .btn-smartfix-success {
-    @apply bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg transition-all active:scale-[0.98] shadow-lg shadow-emerald-900/20 disabled:opacity-50;
-  }
-
-  .filter-card {
-    @apply flex items-center gap-3 md:gap-4 p-3 md:p-4 bg-white dark:bg-smartfix-darker rounded-lg border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none mb-4;
-  }
-
-  /* Поля ввода и кнопки */
-  .filter-input {
-    @apply h-10 px-3 bg-white dark:bg-smartfix-darker rounded-lg border border-gray-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-[#225247] text-sm md:text-base;
+    /* Оптимизация для мобильных: min-h-[44px] для удобного тапа, чуть меньше внутренние отступы */
+    @apply min-h-[44px] px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg transition-all active:scale-[0.98] shadow-lg shadow-emerald-900/20 disabled:opacity-50 text-sm md:text-base;
   }
 
   .btn-details {
-    @apply bg-gray-100 dark:bg-smartfix-medium/20 text-gray-900 dark:text-smartfix-lightest py-2.5 px-5 rounded-lg hover:bg-gray-200 dark:hover:bg-smartfix-medium transition-colors text-sm font-bold active:scale-95 transform;
+    /* Гарантируем минимальную высоту 44px для touch-интерфейсов */
+    @apply min-h-[44px] bg-gray-100 dark:bg-smartfix-medium/20 text-gray-900 dark:text-smartfix-lightest py-2.5 px-5 rounded-lg hover:bg-gray-200 dark:hover:bg-smartfix-medium transition-colors text-sm font-bold active:scale-95 transform;
   }
 
   .btn-page-header {
-    @apply flex items-center justify-center gap-2 font-bold py-2 px-6 rounded-lg transition-all active:scale-[0.98];
-
-    /* Светлая тема: Темно-зеленый акцент (чисто и контрастно) */
+    /* На мобильных кнопка занимает всю ширину (w-full), на десктопе возвращается в авто-ширину (md:w-auto) */
+    @apply w-full md:w-auto flex items-center justify-center gap-2 font-bold min-h-[44px] py-2.5 px-6 rounded-lg transition-all active:scale-[0.98];
+    /* Светлая тема */
     @apply bg-[#a6dccf] text-[#144a35] hover:bg-[#85b9a0] shadow-sm;
-
-    /* Темная тема: Мятный акцент (свечение на темном фоне) */
+    /* Темная тема */
     @apply dark:bg-[#8EB69B] dark:text-[#051F20] dark:hover:bg-[#7ba388];
   }
 
-    .ui-switcher-container {
-      @apply flex overflow-x-auto no-scrollbar gap-1 p-1 bg-white dark:bg-smartfix-darker rounded-lg border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none;
-    }
-  
-    /* Базовая кнопка переключателя */
-    .ui-switcher-button {
-      @apply px-3 md:px-4 py-1.5 text-sm font-bold transition-all whitespace-nowrap rounded-lg;
-    }
-  
-    /* Активное состояние кнопки */
-    .ui-switcher-button.active {
-      @apply bg-[#cff0e7] text-[#196d4a] dark:bg-smartfix-medium dark:text-smartfix-lightest shadow-sm;
-    }
-  
-    /* Неактивное состояние кнопки */
-    .ui-switcher-button.inactive {
-      @apply text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-smartfix-light/60 dark:hover:text-smartfix-light dark:hover:bg-smartfix-medium/20;
-    }
+  /* --- Фильтры и Карточки --- */
 
-    .interactive-border {
-      @apply border border-gray-200 dark:border-white/10 transition-all duration-200 outline-none;
-    }
+  .filter-card {
+    /* Изменено на flex-col для мобильных (чтобы инпуты и кнопки не сжимались в кашу), на md: возвращаем в ряд */
+    @apply flex flex-col md:flex-row md:items-center gap-3 md:gap-4 p-3.5 md:p-4 bg-white dark:bg-smartfix-darker rounded-lg border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none mb-4;
+  }
 
-    /* Состояние фокуса, которое не сдвигает элементы */
-    .interactive-border:focus-within,
-    .interactive-border:focus {
-      @apply border-emerald-500/50 ring-1 ring-emerald-500/20;
-    }
+  .interactive-border {
+    @apply border border-gray-200 dark:border-white/10 transition-all duration-200 outline-none;
+  }
 
-    /* Исправленный filter-input */
-    .filter-input {
-      @apply h-10 px-3 bg-white dark:bg-smartfix-darker rounded-lg text-sm md:text-base interactive-border;
-    }
+  .interactive-border:focus-within,
+  .interactive-border:focus {
+    @apply border-emerald-500/50 ring-1 ring-emerald-500/20;
+  }
 
-  /* Контейнер карточки информации */
+  .filter-input {
+    /* На мобильных инпут растягивается во всю ширину flex-контейнера */
+    @apply w-full h-11 px-3 bg-white dark:bg-smartfix-darker rounded-lg text-base md:text-sm interactive-border;
+    /* Важно: на мобильных размер шрифта text-base (16px) предотвращает авто-зум в iOS Safari при фокусе, на md: можно уменьшить до text-sm */
+  }
+
+  /* --- Переключатели (Tabs / Switcher) --- */
+
+  .ui-switcher-container {
+    /* w-full предотвращает выход за пределы экрана, no-scrollbar скрывает полосу прокрутки при свайпе */
+    @apply w-full flex overflow-x-auto no-scrollbar gap-1 p-1 bg-white dark:bg-smartfix-darker rounded-lg border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none;
+    /* Для плавного скролла пальцем на iOS */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .ui-switcher-button {
+    /* flex-1 позволяет кнопкам равномерно делить место, если их мало. whitespace-nowrap защищает текст от переноса */
+    @apply flex-1 md:flex-initial text-center px-3 md:px-4 py-2 text-xs md:text-sm font-bold transition-all whitespace-nowrap rounded-lg;
+  }
+
+  .ui-switcher-button.active {
+    @apply bg-[#cff0e7] text-[#196d4a] dark:bg-smartfix-medium dark:text-smartfix-lightest shadow-sm;
+  }
+
+  .ui-switcher-button.inactive {
+    @apply text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-smartfix-light/60 dark:hover:text-smartfix-light dark:hover:bg-smartfix-medium/20;
+  }
+
+  /* --- Информационные секции --- */
+
   .info-section-grid {
-    @apply grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-white dark:bg-smartfix-darker rounded-xl border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none;
+    /* На мобильных сетка в 1 колонку, уменьшены внутренние отступы до p-3.5 для экономии экрана */
+    @apply grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 p-3.5 md:p-4 bg-white dark:bg-smartfix-darker rounded-xl border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none;
   }
 
-  /* Метки (заголовки полей) */
   .info-block-label {
-    @apply text-xs font-bold uppercase tracking-wider block text-gray-400 dark:text-smartfix-light/70;
+    @apply text-[10px] md:text-xs font-bold uppercase tracking-wider block text-gray-400 dark:text-smartfix-light/70;
   }
 
-  /* Текст значений */
   .info-block-value {
-    @apply text-sm md:text-base font-medium mt-0.5 text-gray-900 dark:text-smartfix-lightest;
+    @apply text-sm md:text-base font-medium mt-0.5 text-gray-900 dark:text-smartfix-lightest break-words;
+    /* break-words спасет верстку, если в значении будет длинный email или хэш */
   }
 
-  /* --- Кнопки действий (Приведены к единому стандарту) --- */
+  /* --- Кнопки действий (Экшены) --- */
 
-  /* Базовый класс для экшен-кнопок (чтобы не дублировать код) */
   .btn-action-base {
-    @apply flex-1 py-2 px-4 rounded-lg font-bold text-sm md:text-base transition-all duration-200 whitespace-nowrap disabled:opacity-50 disabled:pointer-events-none;
+    /* На мобильных экшен-кнопки встают во всю ширину. Высота увеличена до 46px (отлично для пальцев) */
+    @apply w-full md:w-auto md:flex-1 h-11 md:h-10 px-4 flex items-center justify-center rounded-lg font-bold text-sm md:text-base transition-all duration-200 whitespace-nowrap disabled:opacity-50 disabled:pointer-events-none;
   }
 
-  /* Кнопка "Принять в работу" */
   .btn-action-accept {
     @apply btn-action-base bg-emerald-600 hover:bg-emerald-500 text-white active:scale-[0.98];
   }
 
-  /* Кнопка "Оценить работу" */
   .btn-action-review {
     @apply btn-action-base bg-blue-600 hover:bg-blue-500 text-white active:scale-[0.98];
   }
 
-  /* Контейнер для уже оставленного отзыва */
   .review-display-container {
-    @apply flex-1 flex flex-col gap-2 justify-center py-3 px-4 rounded-lg border bg-gray-50 dark:bg-smartfix-dark/30 border-emerald-500/20 dark:border-emerald-500/30;
+    @apply w-full md:flex-1 flex flex-col gap-1.5 justify-center py-3 px-4 rounded-lg border bg-gray-50 dark:bg-smartfix-dark/30 border-emerald-500/20 dark:border-emerald-500/30;
   }
 }

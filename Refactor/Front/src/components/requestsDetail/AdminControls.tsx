@@ -27,28 +27,27 @@ const AdminControls: React.FC<AdminControlsProps> = ({
     return (
         <section className="space-y-6 animate-in fade-in duration-300">
             {/* Карточка управления */}
-            <div className="rounded-xl border border-gray-200 dark:border-smartfix-medium/20 shadow-xl md:grid-cols-2 gap-4 p-4 bg-white dark:bg-transparent">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {isAdmin && (
-                        <div>
-                            <span className="info-label text-gray-600 dark:text-smartfix-light/70 text-xs font-bold uppercase tracking-wider">Мастер</span>
-                            <select
-                                value={selectedTechnician}
-                                onChange={(e) => setSelectedTechnician(e.target.value)}
-                                className="w-full bg-gray-50 dark:bg-smartfix-dark p-2.5 rounded-lg border border-gray-200 dark:border-smartfix-medium/30 text-gray-900 dark:text-smartfix-lightest outline-none focus:border-emerald-500 dark:focus:border-smartfix-light/30 transition-all"
-                            >
-                                <option value="">Не назначен</option>
-                                {technicians.map((tech) => (
-                                    <option key={tech.id} value={tech.id}>{tech.name}</option>
-                                ))}
-                            </select>
-                        </div>
-                    )}
-
+            <div className="info-section-grid">
+                {isAdmin && (
                     <div>
-                        <span className="info-label text-gray-600 dark:text-smartfix-light/70 text-xs font-bold uppercase tracking-wider">Статус заявки</span>
-                        <StatusSelect value={newStatus} onChange={setNewStatus} />
+                        <span className="info-block-label">Мастер</span>
+                        <select
+                            value={selectedTechnician}
+                            onChange={(e) => setSelectedTechnician(e.target.value)}
+                            className="filter-input"
+                        >
+                            <option value="">Не назначен</option>
+                            {technicians.map((tech) => (
+                                <option key={tech.id} value={tech.id}>{tech.name}</option>
+                            ))}
+                        </select>
                     </div>
+                )}
+
+                <div>
+                    <span className="info-block-label">Статус заявки</span>
+                    {/* Если StatusSelect внутри рендерит обычный select, передайте filter-input внутрь него как className или props */}
+                    <StatusSelect value={newStatus} onChange={setNewStatus}/>
                 </div>
             </div>
 
@@ -72,18 +71,17 @@ const AdminControls: React.FC<AdminControlsProps> = ({
                 <Button
                     variant="outline"
                     onClick={onDelete}
-                    className="py-3 text-red-600 hover:text-red-700 dark:text-red-400 border-red-200 hover:bg-red-50 dark:border-transparent dark:hover:bg-red-500/20"
+                    className="btn-action-base py-3 text-red-600 hover:text-red-700 dark:text-red-400 border-red-200 hover:bg-red-50 dark:border-transparent dark:hover:bg-red-500/20"
                 >
                     Удалить заявку
                 </Button>
                 <Button
                     variant="default"
                     onClick={onSave}
-                    className="py-3 bg-emerald-600 hover:bg-emerald-500 text-white"
+                    className="btn-smartfix-success py-3"
                 >
                     Сохранить изменения
                 </Button>
-
             </div>
         </section>
     );

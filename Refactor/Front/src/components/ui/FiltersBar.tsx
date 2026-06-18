@@ -3,7 +3,7 @@ import React from 'react';
 interface FiltersBarProps {
     activeStatusTab: string;
     filterStatus: string;
-    setFilterStatus: (status: any) => void;
+    setFilterStatus: (status: string) => void; // Исправили any на string
     startDate: string;
     setStartDate: (date: string) => void;
     endDate: string;
@@ -27,8 +27,8 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({
         <div className="filter-card">
             {/* Селект статуса */}
             {activeStatusTab === 'all' && (
-                <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <label htmlFor="status-filter" className="text-sm font-medium text-gray-600 dark:text-smartfix-light">
+                <div className="flex items-center gap-2 w-full md:w-auto">
+                    <label htmlFor="status-filter" className="text-sm font-medium text-gray-600 dark:text-smartfix-light whitespace-nowrap">
                         Статус:
                     </label>
                     <select
@@ -47,34 +47,41 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({
                 </div>
             )}
 
-            {/* Дата С */}
-            <div className="flex items-center gap-2 flex-1 sm:flex-none">
-                <label htmlFor="start-date" className="hidden sm:block text-sm font-medium text-gray-600 dark:text-smartfix-light">С:</label>
-                <input
-                    type="date"
-                    id="start-date"
-                    value={startDate}
-                    onChange={e => setStartDate(e.target.value)}
-                    className="filter-input w-full"
-                />
-            </div>
+            {/* Контейнер для полей даты (Грид 1х2 на мобильных, обычный флекс на десктопе) */}
+            <div className="date-inputs-group grid grid-cols-2 gap-2 w-full md:flex md:w-auto md:contents">
+                {/* Дата С */}
+                <div className="flex items-center gap-1.5 md:gap-2 w-full md:w-auto">
+                    <label htmlFor="start-date" className="text-sm font-medium text-gray-600 dark:text-smartfix-light whitespace-nowrap">
+                        С:
+                    </label>
+                    <input
+                        type="date"
+                        id="start-date"
+                        value={startDate}
+                        onChange={e => setStartDate(e.target.value)}
+                        className="filter-input w-full"
+                    />
+                </div>
 
-            {/* Дата По */}
-            <div className="flex items-center gap-2 flex-1 sm:flex-none">
-                <label htmlFor="end-date" className="hidden sm:block text-sm font-medium text-gray-600 dark:text-smartfix-light">По:</label>
-                <input
-                    type="date"
-                    id="end-date"
-                    value={endDate}
-                    onChange={e => setEndDate(e.target.value)}
-                    className="filter-input w-full"
-                />
+                {/* Дата По */}
+                <div className="flex items-center gap-1.5 md:gap-2 w-full md:w-auto">
+                    <label htmlFor="end-date" className="text-sm font-medium text-gray-600 dark:text-smartfix-light whitespace-nowrap">
+                        По:
+                    </label>
+                    <input
+                        type="date"
+                        id="end-date"
+                        value={endDate}
+                        onChange={e => setEndDate(e.target.value)}
+                        className="filter-input w-full"
+                    />
+                </div>
             </div>
 
             {/* Кнопка сброса */}
             <button
                 onClick={onReset}
-                className="btn-details w-full sm:w-auto sm:ml-auto"
+                className="btn-details w-full md:w-auto md:ml-auto"
             >
                 Сбросить фильтры
             </button>

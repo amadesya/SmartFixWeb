@@ -6,6 +6,7 @@ import { RequestStatus } from '../../types';
 interface StatusSelectProps {
   value: RequestStatus;
   onChange: (val: RequestStatus) => void;
+  className?: string;
 }
 
 // Русские названия статусов
@@ -17,19 +18,26 @@ const statusLabels: Record<RequestStatus, string> = {
   [RequestStatus.Rejected]: 'Отклонена',
 };
 
-export default function StatusSelect({ value, onChange }: StatusSelectProps) {
+export default function StatusSelect({ value, onChange, className = '' }: StatusSelectProps) {
   const options = Object.values(RequestStatus);
 
   return (
     <Listbox value={value} onChange={onChange}>
-      <div className="relative mt-1 w-60">
+      {/* Убрали w-60. Теперь компонент занимает w-full, подстраиваясь под адаптивную 
+        мобильную сетку, но сохраняет возможность кастомизации извне через className 
+      */}
+      <div className={`relative mt-1 w-full ${className}`}>
         <Listbox.Button
           as="button"
-          className="relative w-full cursor-pointer rounded-lg bg-white dark:bg-[#0b2b26] border border-gray-200 dark:border-transparent py-2 pl-3 pr-10 text-left shadow-sm dark:shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-blue-500 text-gray-900 dark:text-white"
+          /* Применили .filter-input. Он автоматически задает h-11, скругления, 
+            фоны для light/dark и эффекты фокуса (:focus-within).
+            Оставляем flex-выравнивание текста, курсор и правый отступ под иконку.
+          */
+          className="filter-input relative w-full cursor-pointer text-left flex items-center pr-10 text-gray-900 dark:text-smartfix-lightest"
         >
           <span className="block truncate">{statusLabels[value]}</span>
-          <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-            <ChevronUpDownIcon className="h-5 w-5 text-gray-400 dark:text-white" aria-hidden="true" />
+          <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+            <ChevronUpDownIcon className="h-5 w-5 text-gray-400 dark:text-smartfix-light/70" aria-hidden="true" />
           </span>
         </Listbox.Button>
 
@@ -39,9 +47,12 @@ export default function StatusSelect({ value, onChange }: StatusSelectProps) {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
+          {/* Для выпадающего списка адаптируем цвета под вашу палитру smartfix 
+            и гарантируем корректное наложение (z-50)
+          */}
           <Listbox.Options
             as="div"
-            className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-[#0b2b26] border border-gray-200 dark:border-transparent py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm text-gray-900 dark:text-white z-50"
+            className="absolute mt-1 max-h-60 w-full overflow-auto rounded-lg bg-white dark:bg-smartfix-darker border border-gray-200 dark:border-white/10 py-1 text-base shadow-lg focus:outline-none sm:text-sm text-gray-900 dark:text-smartfix-lightest z-50"
           >
             {options.map((status) => (
               <Listbox.Option
@@ -49,14 +60,19 @@ export default function StatusSelect({ value, onChange }: StatusSelectProps) {
                 as="div"
                 value={status}
                 className={({ active }) =>
-                  `relative cursor-pointer select-none py-2 pl-10 pr-4 ${active ? 'bg-gray-100 dark:bg-[#0d3b35]' : ''}`
+                  `relative cursor-pointer select-none py-2.5 pl-10 pr-4 transition-colors ${active
+                    ? 'bg-gray-100 dark:bg-smartfix-medium/40 text-gray-900 dark:text-white'
+                    : 'text-gray-900 dark:text-smartfix-lightest'
+                  }`
                 }
               >
                 {({ selected }) => (
                   <>
-                    <span className="block truncate">{statusLabels[status]}</span>
+                    <span className={`block truncate ${selected ? 'font-bold' : 'font-normal'}`}>
+                      {statusLabels[status]}
+                    </span>
                     {selected && (
-                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-600 dark:text-white">
+                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-600 dark:text-emerald-400">
                         <CheckIcon className="h-5 w-5" aria-hidden="true" />
                       </span>
                     )}
