@@ -3,6 +3,7 @@ import EmployeeForm from '../components/employees/EmployeeForm';
 import EmployeesTable from '../components/employees/EmployeesTable';
 import { useEmployees } from '@/hooks/useEmployees';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { ViewSwitcher } from '@/components/ui/ViewSwitcher';
 import EmployeeCard from '@/components/employees/EmployeeCard';
 
 const EmployeesPage: React.FC = () => {
@@ -35,20 +36,14 @@ const EmployeesPage: React.FC = () => {
                 ]}
             />
             <div className="flex items-center justify-end gap-4 mb-6">
-                <div className="flex bg-gray-100 dark:bg-smartfix-darkest p-1 rounded-xl border border-gray-200 dark:border-smartfix-medium/10 shadow-sm dark:shadow-none">
-                    <button
-                        onClick={() => setViewMode('table')}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${viewMode === 'table' ? 'bg-emerald-600 text-white shadow-lg' : 'text-gray-500 hover:text-gray-900 dark:text-smartfix-medium dark:hover:text-smartfix-lightest'}`}
-                    >
-                        Список
-                    </button>
-                    <button
-                        onClick={() => setViewMode('grid')}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${viewMode === 'grid' ? 'bg-emerald-600 text-white shadow-lg' : 'text-gray-500 hover:text-gray-900 dark:text-smartfix-medium dark:hover:text-smartfix-lightest'}`}
-                    >
-                        Сетка
-                    </button>
-                </div>
+                <ViewSwitcher
+                    options={[
+                        { id: 'table', label: 'Список' },
+                        { id: 'grid', label: 'Сетка' }
+                    ]}
+                    activeView={viewMode}
+                    onChange={(id) => setViewMode(id as 'grid' | 'table')}
+                />
             </div>
             {loading ? (
                 <div className="text-center text-gray-500 dark:text-smartfix-light py-20">Загрузка услуг...</div>

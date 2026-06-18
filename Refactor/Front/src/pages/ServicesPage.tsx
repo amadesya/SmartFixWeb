@@ -7,6 +7,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import ServiceItem from '../components/services/ServiceItem';
 import ServiceCard from '@/components/services/ServiceCard';
 import { Search } from '@/components/ui/Search';
+import { ViewSwitcher } from '@/components/ui/ViewSwitcher';
 import { getFullAvatarUrl } from '@/utils/avatarHelper';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
 import toast from 'react-hot-toast';
@@ -206,20 +207,14 @@ const ServicesPage: React.FC = () => {
             )}
 
             <div className="flex items-center justify-end gap-4 mb-6">
-                <div className="flex bg-white dark:bg-smartfix-darkest p-1 rounded-xl border border-gray-200 dark:border-smartfix-medium/10 shadow-sm dark:shadow-none">
-                    <button
-                        onClick={() => setViewMode('list')}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${viewMode === 'list' ? 'bg-[#cff0e7] text-[#196d4a] shadow-lg' : 'text-gray-500 hover:text-gray-900 dark:text-smartfix-medium dark:hover:text-smartfix-lightest'}`}
-                    >
-                        Список
-                    </button>
-                    <button
-                        onClick={() => setViewMode('grid')}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${viewMode === 'grid' ? 'bg-[#cff0e7] text-[#196d4a] shadow-lg' : 'text-gray-500 hover:text-gray-900 dark:text-smartfix-medium dark:hover:text-smartfix-lightest'}`}
-                    >
-                        Сетка
-                    </button>
-                </div>
+                <ViewSwitcher
+                    options={[
+                        { id: 'list', label: 'Список' },
+                        { id: 'grid', label: 'Сетка' }
+                    ]}
+                    activeView={viewMode}
+                    onChange={(id) => setViewMode(id as 'grid' | 'list')}
+                />
             </div>
 
             {isLoading ? (
