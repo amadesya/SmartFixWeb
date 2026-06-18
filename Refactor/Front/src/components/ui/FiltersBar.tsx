@@ -74,7 +74,7 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({
             {/* Кнопка сброса */}
             <button
                 onClick={onReset}
-                className="text-xs md:text-sm border border-emerald-600 text-emerald-700 bg-transparent hover:bg-emerald-50 dark:bg-smartfix-medium dark:text-white dark:border-transparent dark:hover:bg-opacity-80 px-3 md:px-4 py-1.5 md:py-2 rounded-lg transition-colors w-full sm:w-auto sm:ml-auto"
+                className="text-xs md:text-sm px-3 md:px-4 py-1.5 md:py-2 w-full sm:w-auto sm:ml-auto bg-gray-100 dark:bg-smartfix-medium/20 text-gray-900 dark:text-smartfix-lightest rounded-xl hover:bg-gray-200 dark:hover:bg-smartfix-medium transition-colors font-bold active:scale-95 transform"
             >
                 Сбросить фильтры
             </button>
