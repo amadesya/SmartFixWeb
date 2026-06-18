@@ -34,16 +34,6 @@ export const ReviewsPage: React.FC = () => {
         <div className="max-w-4xl mx-auto  px-4">
             <PageHeader title="Отзывы" />
 
-            {/* <ReviewForm
-                user={user}
-                newComment={newComment}
-                setNewComment={setNewComment}
-                rating={rating}
-                setRating={setRating}
-                onSubmit={handleAddReview}
-                isSubmitting={isSubmitting}
-            /> */}
-
             <div className="space-y-6 mt-10">
                 {loading ? (
                     <p className="text-center text-smartfix-light/30 text-sm py-10 animate-pulse">
