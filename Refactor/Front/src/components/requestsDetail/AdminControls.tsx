@@ -14,6 +14,13 @@ interface AdminControlsProps {
     onDelete: () => void;
 }
 
+const requestStatusOptions = [
+    { value: 'pending', label: 'В ожидании' },
+    { value: 'in_progress', label: 'В работе' },
+    { value: 'completed', label: 'Выполнено' },
+    { value: 'canceled', label: 'Отменено' },
+];
+
 const AdminControls: React.FC<AdminControlsProps> = ({
     isAdmin,
     technicians,
@@ -28,26 +35,45 @@ const AdminControls: React.FC<AdminControlsProps> = ({
         <section className="space-y-6 animate-in fade-in duration-300">
             {/* Карточка управления */}
             <div className="info-section-grid">
+                {/* Фильтр: Мастер */}
                 {isAdmin && (
-                    <div>
-                        <span className="info-block-label">Мастер</span>
+                    <div className="flex items-center gap-2 w-full md:w-auto">
+                        <label htmlFor="technician-filter" className="text-sm font-medium text-gray-600 dark:text-smartfix-light whitespace-nowrap">
+                            Мастер:
+                        </label>
                         <select
-                            value={selectedTechnician}
+                            id="technician-filter"
                             onChange={(e) => setSelectedTechnician(e.target.value)}
-                            className="filter-input"
+                            value={selectedTechnician}
+                            className="filter-input flex-1 text-white"
                         >
-                            <option value="">Не назначен</option>
+                            <option value="" className="text-white">Не назначен</option>
                             {technicians.map((tech) => (
-                                <option key={tech.id} value={tech.id}>{tech.name}</option>
+                                <option key={tech.id} value={tech.id} className="text-white">
+                                    {tech.name}
+                                </option>
                             ))}
                         </select>
                     </div>
                 )}
 
-                <div>
-                    <span className="info-block-label">Статус заявки</span>
-                    {/* Если StatusSelect внутри рендерит обычный select, передайте filter-input внутрь него как className или props */}
-                    <StatusSelect value={newStatus} onChange={setNewStatus}/>
+                {/* Фильтр: Статус заявки */}
+                <div className="flex items-center gap-2 w-full md:w-auto">
+                    <label htmlFor="status-select-filter" className="text-sm font-medium text-gray-600 dark:text-smartfix-light whitespace-nowrap">
+                        Статус заявки:
+                    </label>
+                    <select
+                        id="status-select-filter"
+                        value={newStatus}
+                        onChange={(e) => setNewStatus(e.target.value)}
+                        className="filter-input flex-1 text-white"
+                    >
+                        {requestStatusOptions.map((opt) => (
+                            <option key={opt.value} value={opt.value} className="text-white">
+                                {opt.label}
+                            </option>
+                        ))}
+                    </select>
                 </div>
             </div>
 
