@@ -29,7 +29,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, footer 
       onClick={onClose}
     >
       <div
-        className="bg-white dark:bg-smartfix-dark w-full max-w-2xl rounded-2xl shadow-xl border border-gray-200 dark:border-smartfix-medium/30 overflow-hidden animate-in zoom-in-95 duration-200"
+        className="bg-white dark:bg-smartfix-darker/75 w-full max-w-2xl rounded-2xl shadow-xl border border-gray-200 dark:border-smartfix-medium/30 overflow-hidden animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Шапка */}

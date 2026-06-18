@@ -8,7 +8,7 @@ interface RequestCardProps {
 
 export const RequestCard: React.FC<RequestCardProps> = ({ request, onOpenDetails }) => {
     return (
-        <div className="p-5 mb-4 rounded-2xl bg-white dark:bg-smartfix-darker border border-gray-200 dark:border-white/10 hover:border-emerald-500/30 dark:hover:border-smartfix-light/30 transition-all duration-200 shadow-sm">
+        <div className="p-5 mb-4 rounded-2xl bg-white dark:bg-smartfix-darker interactive-border hover:border-emerald-500/50 shadow-sm transition-all duration-200">
             {/* Верхняя часть: Заголовок и Дата */}
             <div className="flex justify-between items-start mb-3">
                 <div>

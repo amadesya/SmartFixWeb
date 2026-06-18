@@ -210,9 +210,80 @@
     @apply flex items-center justify-center gap-2 font-bold py-2 px-6 rounded-lg transition-all active:scale-[0.98];
 
     /* Светлая тема: Темно-зеленый акцент (чисто и контрастно) */
-    @apply bg-[#9BC8B2] text-[#163832] hover:bg-[#85b9a0] shadow-sm;
+    @apply bg-[#a6dccf] text-[#144a35] hover:bg-[#85b9a0] shadow-sm;
 
     /* Темная тема: Мятный акцент (свечение на темном фоне) */
     @apply dark:bg-[#8EB69B] dark:text-[#051F20] dark:hover:bg-[#7ba388];
+  }
+
+    .ui-switcher-container {
+      @apply flex overflow-x-auto no-scrollbar gap-1 p-1 bg-white dark:bg-smartfix-darker rounded-lg border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none;
+    }
+  
+    /* Базовая кнопка переключателя */
+    .ui-switcher-button {
+      @apply px-3 md:px-4 py-1.5 text-sm font-bold transition-all whitespace-nowrap rounded-lg;
+    }
+  
+    /* Активное состояние кнопки */
+    .ui-switcher-button.active {
+      @apply bg-[#cff0e7] text-[#196d4a] dark:bg-smartfix-medium dark:text-smartfix-lightest shadow-sm;
+    }
+  
+    /* Неактивное состояние кнопки */
+    .ui-switcher-button.inactive {
+      @apply text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-smartfix-light/60 dark:hover:text-smartfix-light dark:hover:bg-smartfix-medium/20;
+    }
+
+    .interactive-border {
+      @apply border border-gray-200 dark:border-white/10 transition-all duration-200 outline-none;
+    }
+
+    /* Состояние фокуса, которое не сдвигает элементы */
+    .interactive-border:focus-within,
+    .interactive-border:focus {
+      @apply border-emerald-500/50 ring-1 ring-emerald-500/20;
+    }
+
+    /* Исправленный filter-input */
+    .filter-input {
+      @apply h-10 px-3 bg-white dark:bg-smartfix-darker rounded-lg text-sm md:text-base interactive-border;
+    }
+
+  /* Контейнер карточки информации */
+  .info-section-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-white dark:bg-smartfix-darker rounded-xl border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none;
+  }
+
+  /* Метки (заголовки полей) */
+  .info-block-label {
+    @apply text-xs font-bold uppercase tracking-wider block text-gray-400 dark:text-smartfix-light/70;
+  }
+
+  /* Текст значений */
+  .info-block-value {
+    @apply text-sm md:text-base font-medium mt-0.5 text-gray-900 dark:text-smartfix-lightest;
+  }
+
+  /* --- Кнопки действий (Приведены к единому стандарту) --- */
+
+  /* Базовый класс для экшен-кнопок (чтобы не дублировать код) */
+  .btn-action-base {
+    @apply flex-1 py-2 px-4 rounded-lg font-bold text-sm md:text-base transition-all duration-200 whitespace-nowrap disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  /* Кнопка "Принять в работу" */
+  .btn-action-accept {
+    @apply btn-action-base bg-emerald-600 hover:bg-emerald-500 text-white active:scale-[0.98];
+  }
+
+  /* Кнопка "Оценить работу" */
+  .btn-action-review {
+    @apply btn-action-base bg-blue-600 hover:bg-blue-500 text-white active:scale-[0.98];
+  }
+
+  /* Контейнер для уже оставленного отзыва */
+  .review-display-container {
+    @apply flex-1 flex flex-col gap-2 justify-center py-3 px-4 rounded-lg border bg-gray-50 dark:bg-smartfix-dark/30 border-emerald-500/20 dark:border-emerald-500/30;
   }
 }

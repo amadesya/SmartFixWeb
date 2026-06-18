@@ -150,11 +150,13 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = (props) => {
         >
             <div className="flex flex-col h-[600px]">
 
-                <Tabs
-                    options={tabOptions}
-                    activeTab={activeTab}
-                    onTabChange={setActiveTab}
-                />
+                <div className="pr-2">
+                    <Tabs
+                        options={tabOptions}
+                        activeTab={activeTab}
+                        onTabChange={setActiveTab}
+                    />
+                </div>
 
                 <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
                     {activeTab === 'overview' && (

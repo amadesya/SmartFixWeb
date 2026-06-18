@@ -23,8 +23,7 @@ export const Search: React.FC<SearchProps> = ({
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}
-                // Использование общего класса, как в FiltersBar (предполагая наличие в CSS)
-                className="filter-input w-full pl-10"
+                className="filter-input w-full pl-10 interactive-border focus:ring-0"
             />
         </div>
     );
