@@ -20,7 +20,7 @@ export const Tabs: React.FC<TabsProps> = ({ options, activeTab, onTabChange, cla
                     key={option.id}
                     onClick={() => onTabChange(option.id)}
                     className={`px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-bold transition-all whitespace-nowrap rounded-lg ${activeTab === option.id
-                        ? 'bg-[#cff0e7] text-[#196d4a] dark:bg-smartfix-medium dark:text-smartfix-lightest shadow-md'
+                        ? 'bg-[#cff0e7] text-[#196d4a] dark:bg-smartfix-medium dark:text-smartfix-lightest'
                         : 'text-gray-700 hover:text-gray-900 hover:bg-gray-200 dark:text-smartfix-light/60 dark:hover:text-smartfix-light dark:hover:bg-smartfix-medium/20'
                         }`}
             >

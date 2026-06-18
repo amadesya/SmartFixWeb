@@ -24,8 +24,8 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({
     requestStatusOptions
 }) => {
     return (
-        <div className="flex flex-wrap items-center gap-3 mb-4 md:mb-6 p-3 md:p-4 bg-white dark:bg-smartfix-dark rounded-lg border border-gray-200 dark:border-smartfix-medium shadow-sm dark:shadow-none">
-            {/* Селект статуса: показываем только если выбрана вкладка "Все" */}
+        <div className="filter-card">
+            {/* Селект статуса */}
             {activeStatusTab === 'all' && (
                 <div className="flex items-center gap-2 w-full sm:w-auto">
                     <label htmlFor="status-filter" className="text-sm font-medium text-gray-600 dark:text-smartfix-light">
@@ -35,7 +35,7 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({
                         id="status-filter"
                         onChange={(e) => setFilterStatus(e.target.value)}
                         value={filterStatus}
-                        className="bg-gray-50 dark:bg-smartfix-darker p-1.5 md:p-2 rounded-lg border border-gray-200 dark:border-smartfix-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-smartfix-light text-sm md:text-base text-gray-900 dark:text-smartfix-lightest flex-1"
+                        className="filter-input flex-1"
                     >
                         <option value="all">Все статусы</option>
                         {requestStatusOptions.map((opt) => (
@@ -55,7 +55,7 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({
                     id="start-date"
                     value={startDate}
                     onChange={e => setStartDate(e.target.value)}
-                    className="bg-gray-50 dark:bg-smartfix-darker p-1.5 md:p-2 rounded-lg border border-gray-200 dark:border-smartfix-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-smartfix-light text-xs md:text-sm text-gray-900 dark:text-smartfix-lightest w-full"
+                    className="filter-input w-full"
                 />
             </div>
 
@@ -67,14 +67,14 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({
                     id="end-date"
                     value={endDate}
                     onChange={e => setEndDate(e.target.value)}
-                    className="bg-gray-50 dark:bg-smartfix-darker p-1.5 md:p-2 rounded-lg border border-gray-200 dark:border-smartfix-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-smartfix-light text-xs md:text-sm text-gray-900 dark:text-smartfix-lightest w-full"
+                    className="filter-input w-full"
                 />
             </div>
 
             {/* Кнопка сброса */}
             <button
                 onClick={onReset}
-                className="text-xs md:text-sm px-3 md:px-4 py-1.5 md:py-2 w-full sm:w-auto sm:ml-auto bg-gray-100 dark:bg-smartfix-medium/20 text-gray-900 dark:text-smartfix-lightest rounded-xl hover:bg-gray-200 dark:hover:bg-smartfix-medium transition-colors font-bold active:scale-95 transform"
+                className="btn-details w-full sm:w-auto sm:ml-auto"
             >
                 Сбросить фильтры
             </button>

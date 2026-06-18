@@ -42,7 +42,7 @@ export const RequestCard: React.FC<RequestCardProps> = ({ request, onOpenDetails
 
                 <button
                     onClick={() => onOpenDetails(request)}
-                    className="bg-gray-100 dark:bg-smartfix-medium/20 text-gray-900 dark:text-smartfix-lightest py-2.5 px-5 rounded-xl hover:bg-gray-200 dark:hover:bg-smartfix-medium transition-colors text-sm font-bold active:scale-95 transform"
+                    className="btn-details"
                 >
                     Подробнее
                 </button>

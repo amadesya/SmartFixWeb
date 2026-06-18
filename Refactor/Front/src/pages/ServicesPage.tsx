@@ -206,16 +206,16 @@ const ServicesPage: React.FC = () => {
             )}
 
             <div className="flex items-center justify-end gap-4 mb-6">
-                <div className="flex bg-gray-100 dark:bg-smartfix-darkest p-1 rounded-xl border border-gray-200 dark:border-smartfix-medium/10 shadow-sm dark:shadow-none">
+                <div className="flex bg-white dark:bg-smartfix-darkest p-1 rounded-xl border border-gray-200 dark:border-smartfix-medium/10 shadow-sm dark:shadow-none">
                     <button
                         onClick={() => setViewMode('list')}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${viewMode === 'list' ? 'bg-emerald-600 text-white shadow-lg' : 'text-gray-500 hover:text-gray-900 dark:text-smartfix-medium dark:hover:text-smartfix-lightest'}`}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${viewMode === 'list' ? 'bg-[#cff0e7] text-[#196d4a] shadow-lg' : 'text-gray-500 hover:text-gray-900 dark:text-smartfix-medium dark:hover:text-smartfix-lightest'}`}
                     >
                         Список
                     </button>
                     <button
                         onClick={() => setViewMode('grid')}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${viewMode === 'grid' ? 'bg-emerald-600 text-white shadow-lg' : 'text-gray-500 hover:text-gray-900 dark:text-smartfix-medium dark:hover:text-smartfix-lightest'}`}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${viewMode === 'grid' ? 'bg-[#cff0e7] text-[#196d4a] shadow-lg' : 'text-gray-500 hover:text-gray-900 dark:text-smartfix-medium dark:hover:text-smartfix-lightest'}`}
                     >
                         Сетка
                     </button>

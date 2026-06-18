@@ -19,7 +19,7 @@ const StatusBadge = ({ status }: { status: RequestStatus }) => {
     };
 
     return (
-        <span className={`px-3 py-1 text-sm font-medium rounded-full ${statusClasses[status]}`}>
+        <span className={`px-3 py-1 text-sm font-medium rounded-xl ${statusClasses[status]}`}>
             {statusLabels[status]}
         </span>
     );

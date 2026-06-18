@@ -25,7 +25,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ title, actions }) => {
                             onClick={action.onClick}
                             className="flex items-center justify-center gap-2 bg-smartfix-light text-smartfix-darkest font-bold py-2 px-6 rounded-lg hover:bg-opacity-80 transition-colors"
                         >
-                            {action.label === "Добавить услугу" && <PlusIcon className="w-5 h-5" />}
+                            {action.label === "Добавить услугу"}
                             {action.label}
                         </button>
                     ))}
