@@ -45,11 +45,11 @@ const AdminControls: React.FC<AdminControlsProps> = ({
                             id="technician-filter"
                             onChange={(e) => setSelectedTechnician(e.target.value)}
                             value={selectedTechnician}
-                            className="filter-input flex-1 text-white"
+                            className="filter-input flex-1"
                         >
-                            <option value="" className="text-white">Не назначен</option>
+                            <option value="">Не назначен</option>
                             {technicians.map((tech) => (
-                                <option key={tech.id} value={tech.id} className="text-white">
+                                <option key={tech.id} value={tech.id}>
                                     {tech.name}
                                 </option>
                             ))}
@@ -66,10 +66,10 @@ const AdminControls: React.FC<AdminControlsProps> = ({
                         id="status-select-filter"
                         value={newStatus}
                         onChange={(e) => setNewStatus(e.target.value)}
-                        className="filter-input flex-1 text-white"
+                        className="filter-input flex-1"
                     >
                         {requestStatusOptions.map((opt) => (
-                            <option key={opt.value} value={opt.value} className="text-white">
+                            <option key={opt.value} value={opt.value}>
                                 {opt.label}
                             </option>
                         ))}

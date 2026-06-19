@@ -228,7 +228,7 @@
 
   .filter-input {
     /* Замените text-base md:text-sm на просто text-base */
-    @apply w-full h-11 px-3 bg-white dark:bg-smartfix-darker rounded-lg text-base interactive-border;
+    @apply w-full h-11 px-3 text-black dark:text-smartfix-lightest bg-white dark:bg-smartfix-darker rounded-lg text-base interactive-border;
   }
   /* --- Переключатели (Tabs / Switcher) --- */
 
