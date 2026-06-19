@@ -95,16 +95,14 @@ const AdminControls: React.FC<AdminControlsProps> = ({
             {/* Кнопки действий */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4">
                 <Button
-                    variant="outline"
                     onClick={onDelete}
                     className="btn-action-base py-3 text-red-600 hover:text-red-700 dark:text-red-400 border-red-200 hover:bg-red-50 dark:border-transparent dark:hover:bg-red-500/20"
                 >
                     Удалить заявку
                 </Button>
                 <Button
-                    variant="default"
                     onClick={onSave}
-                    className="btn-smartfix-success py-3"
+                    className="btn-page-header"
                 >
                     Сохранить изменения
                 </Button>
