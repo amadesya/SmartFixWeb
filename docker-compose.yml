@@ -35,6 +35,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
     volumes:
       - ./data/uploads:/app/wwwroot/uploads
+      - ./Backend/wwwroot/avatars:/app/wwwroot/avatars
     networks:
       - app-network
     depends_on:
