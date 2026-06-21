@@ -95,52 +95,70 @@ export const NotificationBell: React.FC = () => {
                 )}
             </button>
 
-            {isOpen && (
-                <div className="absolute right-0 mt-2 w-80 bg-smartfix-dark rounded-lg shadow-xl border border-smartfix-medium/30 overflow-hidden z-50">
-                    <div className="p-3 border-b border-smartfix-medium/30 flex justify-between items-center bg-smartfix-darker">
-                        <h3 className="font-bold text-smartfix-lightest">Уведомления</h3>
-                        {notifications.length > 0 && (
-                            <button
-                                onClick={handleMarkAllAsRead}
-                                className="text-xs text-smartfix-light hover:underline"
+{isOpen && (
+    <>
+        {/* Задний фон-затемнение (overlay) для мобилок, чтобы закрывать по клику мимо */}
+        <div 
+            className="fixed inset-0 bg-black/50 z-40 md:hidden" 
+            onClick={() => setIsOpen(false)} // Замените на вашу функцию закрытия
+        />
+
+        <div className="
+            /* Мобильные стили: фиксируем на весь экран или как шторку */
+            fixed inset-x-4 top-20 bottom-4 mx-auto 
+            md:absolute md:inset-auto md:right-0 md:top-full md:bottom-auto md:mt-2 md:w-80 
+            bg-smartfix-dark rounded-lg shadow-xl border border-smartfix-medium/30 
+            overflow-hidden z-50 flex flex-col
+        ">
+            {/* Шапка */}
+            <div className="p-3 border-b border-smartfix-medium/30 flex justify-between items-center bg-smartfix-darker shrink-0">
+                <h3 className="font-bold text-smartfix-lightest">Уведомления</h3>
+                {notifications.length > 0 && (
+                    <button
+                        onClick={handleMarkAllAsRead}
+                        className="text-xs text-smartfix-light hover:underline"
+                    >
+                        Прочитать все
+                    </button>
+                )}
+            </div>
+            
+            {/* Список уведомлений */}
+            <div className="overflow-y-auto flex-1 max-h-none md:max-h-96">
+                {notifications.length === 0 ? (
+                    <div className="p-4 text-center text-sm text-smartfix-light">
+                        Нет новых уведомлений
+                    </div>
+                ) : (
+                    <div className="flex flex-col">
+                        {notifications.map(notification => (
+                            <div 
+                                key={notification.id} 
+                                className="p-3 border-b border-smartfix-medium/10 hover:bg-smartfix-medium/20 transition-colors group relative"
                             >
-                                Прочитать все
-                            </button>
-                        )}
-                    </div>
-                    
-                    <div className="max-h-96 overflow-y-auto">
-                        {notifications.length === 0 ? (
-                            <div className="p-4 text-center text-sm text-smartfix-light">
-                                Нет новых уведомлений
+                                <p className="text-sm text-smartfix-lightest pr-8">
+                                    {notification.message}
+                                </p>
+                                <span className="text-[10px] text-smartfix-light mt-1 block">
+                                    {new Date(notification.createdAt).toLocaleString()}
+                                </span>
+                                
+                                {/* Кнопка "Удалить/Прочитать" на мобилках должна быть видимой сразу, а не по hover */}
+                                <button
+                                    onClick={() => handleMarkAsRead(notification.id)}
+                                    className="absolute top-3 right-3 opacity-100 md:opacity-0 md:group-hover:opacity-100 text-smartfix-light hover:text-smartfix-lightest transition-opacity p-1"
+                                    title="Пометить как прочитанное"
+                                >
+                                    ✕
+                                </button>
                             </div>
-                        ) : (
-                            <div className="flex flex-col">
-                                {notifications.map(notification => (
-                                    <div 
-                                        key={notification.id} 
-                                        className="p-3 border-b border-smartfix-medium/10 hover:bg-smartfix-medium/20 transition-colors group relative"
-                                    >
-                                        <p className="text-sm text-smartfix-lightest pr-6">
-                                            {notification.message}
-                                        </p>
-                                        <span className="text-[10px] text-smartfix-light mt-1 block">
-                                            {new Date(notification.createdAt).toLocaleString()}
-                                        </span>
-                                        <button
-                                            onClick={() => handleMarkAsRead(notification.id)}
-                                            className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 text-smartfix-light hover:text-smartfix-lightest transition-opacity"
-                                            title="Пометить как прочитанное"
-                                        >
-                                            ✕
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                        ))}
                     </div>
-                </div>
-            )}
+                )}
+            </div>
+        </div>
+    </>
+)}
         </div>
     );
 };

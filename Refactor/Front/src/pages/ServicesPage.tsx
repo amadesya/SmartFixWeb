@@ -207,14 +207,16 @@ const ServicesPage: React.FC = () => {
             )}
 
             <div className="flex items-center justify-end gap-4 mb-6">
-                <ViewSwitcher
-                    options={[
-                        { id: 'list', label: 'Список' },
-                        { id: 'grid', label: 'Сетка' }
-                    ]}
-                    activeView={viewMode}
-                    onChange={(id) => setViewMode(id as 'grid' | 'list')}
-                />
+                <div className="max-w-max !w-auto">
+                    <ViewSwitcher
+                        options={[
+                            { id: 'list', label: 'Список' },
+                            { id: 'grid', label: 'Сетка' }
+                        ]}
+                        activeView={viewMode}
+                        onChange={(id) => setViewMode(id as 'grid' | 'list')}
+                    />
+                </div>
             </div>
 
             {isLoading ? (

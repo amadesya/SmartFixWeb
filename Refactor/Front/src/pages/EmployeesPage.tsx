@@ -36,14 +36,16 @@ const EmployeesPage: React.FC = () => {
                 ]}
             />
             <div className="flex items-center justify-end gap-4 mb-6">
-                <ViewSwitcher
-                    options={[
-                        { id: 'table', label: 'Список' },
-                        { id: 'grid', label: 'Сетка' }
-                    ]}
-                    activeView={viewMode}
-                    onChange={(id) => setViewMode(id as 'grid' | 'table')}
-                />
+                <div className="max-w-max !w-auto">
+                    <ViewSwitcher
+                        options={[
+                            { id: 'table', label: 'Список' },
+                            { id: 'grid', label: 'Сетка' }
+                        ]}
+                        activeView={viewMode}
+                        onChange={(id) => setViewMode(id as 'grid' | 'table')}
+                    />
+                </div>
             </div>
             {loading ? (
                 <div className="text-center text-gray-500 dark:text-smartfix-light py-20">Загрузка услуг...</div>
