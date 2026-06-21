@@ -44,6 +44,9 @@ const UserTable: React.FC<UserTableProps> = (props) => {
                             src={getFullAvatarUrl(user.avatar) ?? ''}
                             alt={user.name}
                             className="w-10 h-10 rounded-full object-cover"
+                            onError={(e) => {
+                                e.target.src = '/public/avatar-default.png'; 
+                            }}
                         />
                     ) : (
                         <div className="w-10 h-10 rounded-full bg-smartfix-medium flex items-center justify-center text-white font-bold">
