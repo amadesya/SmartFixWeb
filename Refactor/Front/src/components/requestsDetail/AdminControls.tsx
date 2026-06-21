@@ -1,7 +1,6 @@
 import React from 'react';
 import StatusSelect from '@/components/ui/StatusSelect';
-import { Button } from '@/components/ui/Button';
-import { User } from '@/types';
+import { RequestStatus, User } from '@/types';
 
 interface AdminControlsProps {
     isAdmin: boolean;
@@ -15,10 +14,10 @@ interface AdminControlsProps {
 }
 
 const requestStatusOptions = [
-    { value: 'pending', label: 'В ожидании' },
-    { value: 'in_progress', label: 'В работе' },
-    { value: 'completed', label: 'Выполнено' },
-    { value: 'canceled', label: 'Отменено' },
+    { value: RequestStatus.New, label: 'В ожидании' },
+    { value: RequestStatus.InProgress, label: 'В работе' },
+    { value: RequestStatus.Ready, label: 'Выполнено' },
+    { value: RequestStatus.Rejected, label: 'Отменено' },
 ];
 
 const AdminControls: React.FC<AdminControlsProps> = ({
@@ -64,8 +63,8 @@ const AdminControls: React.FC<AdminControlsProps> = ({
                     </label>
                     <select
                         id="status-select-filter"
-                        value={newStatus}
-                        onChange={(e) => setNewStatus(e.target.value)}
+                        value={newStatus || ''}
+                        onChange={(e) => setNewStatus(e.target.value as RequestStatus)}
                         className="filter-input flex-1"
                     >
                         {requestStatusOptions.map((opt) => (
@@ -94,18 +93,18 @@ const AdminControls: React.FC<AdminControlsProps> = ({
 
             {/* Кнопки действий */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4">
-                <Button
+                <button
                     onClick={onDelete}
-                    className="btn-action-base py-3 text-red-600 hover:text-red-700 dark:text-red-400 border-red-200 hover:bg-red-50 dark:border-transparent dark:hover:bg-red-500/20"
+                    className="btn-action-base border py-3 text-red-600 hover:text-red-700 dark:text-red-400 border-red-200 hover:bg-red-50 dark:border-transparent dark:hover:bg-red-500/20"
                 >
                     Удалить заявку
-                </Button>
-                <Button
+                </button>
+                <button
                     onClick={onSave}
-                    className="btn-page-header"
+                    className="btn-action-base border border-transparent bg-[#a6dccf] text-[#144a35] hover:bg-[#85b9a0] shadow-sm dark:bg-[#8EB69B] dark:text-[#051F20] dark:hover:bg-[#7ba388]"
                 >
                     Сохранить изменения
-                </Button>
+                </button>
             </div>
         </section>
     );

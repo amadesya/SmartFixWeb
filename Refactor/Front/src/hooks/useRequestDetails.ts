@@ -203,7 +203,11 @@ const handleUpdateRequest = async () => {
         await refreshList?.();
         closeDetailsModal();
         } catch (error: any) {
-        console.error("Failed to update request:", error);
+        console.error(
+            "[handleUpdateRequest] Ошибка при обновлении заявки",
+            { id: selectedRequest?.id, status: newStatus, technicianId: selectedTechnician },
+            error
+        );
             toast.error(error.message || "Не удалось обновить заявку. Попробуйте снова.");
     }
 };

@@ -15,7 +15,7 @@ const ModalActions: React.FC<ModalActionsProps> = ({
 }) => (
     <div className="flex flex-wrap items-center gap-3 pt-6 border-t border-smartfix-medium/20">
         {isStaff && (
-            <button onClick={onDelete} className="btn-danger-outline">
+            <button onClick={onDelete} className="btn-primary">
                 Удалить заявку
             </button>
         )}

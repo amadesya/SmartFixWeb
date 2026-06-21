@@ -198,7 +198,15 @@ export async function updateRepairRequest(
     },
     body: JSON.stringify({ technicianId, device, issueDescription, status }),
   });
-  if (!res.ok) throw new Error("Не удалось обновить заявку");
+  if (!res.ok) {
+    const errBody = await res.json().catch(() => null);
+    const serverMsg = errBody?.message || errBody?.title || "";
+    console.error(
+      `[updateRepairRequest] PUT ${id} → ${res.status} ${res.statusText}`,
+      errBody
+    );
+    throw new Error(serverMsg || `Сервер вернул ${res.status} ${res.statusText}`);
+  }
   return res.json(); // backend now returns { request, partsReturned }
 }
 
