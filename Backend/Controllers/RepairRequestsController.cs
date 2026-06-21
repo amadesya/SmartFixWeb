@@ -1124,10 +1124,6 @@ public class RepairRequestsController : ControllerBase
             request.Client.BonusPoints -= dto.BonusesToSubtract;
             request.Price -= dto.BonusesToSubtract;
 
-            // Начисляем баллы лояльности за списанные бонусы (5% от суммы списанных бонусов)
-            request.Client.BonusPoints += dto.BonusesToSubtract * 0.05m;
-            request.Client.TotalSpent += dto.BonusesToSubtract;
-
             // Обновляем уровень лояльности на основе TotalSpent
             if (request.Client.TotalSpent >= 50000)
             {
