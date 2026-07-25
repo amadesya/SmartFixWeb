@@ -2,7 +2,7 @@
 
 Веб-приложение для автоматизации работы сервисного центра по ремонту техники: управление заявками, учет клиентов, каталог услуг, авторизация и уведомления.
 
-**Демо приложения (Live):** [https://smartfix.amadesu.space](https://smartfix.amadesu.space)
+**Демо приложения:** [https://smartfix.amadesu.space](https://smartfix.amadesu.space)
 
 ## Технологический стек
 
