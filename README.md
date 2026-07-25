@@ -27,13 +27,13 @@
 - Docker Desktop и Docker Compose
 
 ### Запуск проекта
-###1. Клонируйте репозиторий:
+### 1. Клонируйте репозиторий:
    ```bash
    git clone [https://github.com/твое_имя/SmartFixWeb.git](https://github.com/твое_имя/SmartFixWeb.git)
    cd SmartFixWeb
    ```
 
-###2. Создайте файл .env в корне проекта на основе .env.example:
+### 2. Создайте файл .env в корне проекта на основе .env.example:
 ```bash
 DB_NAME=smartfix
 DB_USER=smartfix_user
@@ -53,7 +53,7 @@ Frontend: http://localhost:3000
 
 Backend API: http://localhost:8080
 
-📂 Структура проекта
+Структура проекта
 ```
 SmartFixWeb/
 ├── .github/workflows/   # Скрипты автоматического деплоя (CI/CD)
