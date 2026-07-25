@@ -39,7 +39,7 @@
 ### Предварительные требования
 - Docker Desktop и Docker Compose
 
-### Запуск проекта
+## Запуск проекта
 ### 1. Клонируйте репозиторий:
    ```bash
    git clone [https://github.com/твое_имя/SmartFixWeb.git](https://github.com/твое_имя/SmartFixWeb.git)
@@ -54,9 +54,9 @@ DB_PASSWORD=your_password
 DB_ROOT_PASSWORD=your_root_password
 JWT_SECRET_KEY=your_super_secret_jwt_key
 TELEGRAM_BOT_TOKEN=your_telegram_bot_token
-Запустите контейнеры:
 ```
 
+Запустите контейнеры: 
 ```bash
 docker compose up -d --build
 ```
