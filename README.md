@@ -27,14 +27,15 @@
 - Docker Desktop и Docker Compose
 
 ### Запуск проекта
-1. Клонируйте репозиторий:
+###1. Клонируйте репозиторий:
    ```bash
    git clone [https://github.com/твое_имя/SmartFixWeb.git](https://github.com/твое_имя/SmartFixWeb.git)
    cd SmartFixWeb
    ```
 
-2. Создайте файл .env в корне проекта на основе .env.example:
-```DB_NAME=smartfix
+###2. Создайте файл .env в корне проекта на основе .env.example:
+```bash
+DB_NAME=smartfix
 DB_USER=smartfix_user
 DB_PASSWORD=your_password
 DB_ROOT_PASSWORD=your_root_password
@@ -43,7 +44,7 @@ TELEGRAM_BOT_TOKEN=your_telegram_bot_token
 Запустите контейнеры:
 ```
 
-```Bash
+```bash
 docker compose up -d --build
 ```
 Приложение будет доступно по адресам:
