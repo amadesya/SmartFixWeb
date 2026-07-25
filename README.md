@@ -42,7 +42,7 @@
 ## Запуск проекта
 ### 1. Клонируйте репозиторий:
    ```bash
-   git clone [https://github.com/твое_имя/SmartFixWeb.git](https://github.com/твое_имя/SmartFixWeb.git)
+   git clone https://github.com/amadesya/SmartFixWeb.git
    cd SmartFixWeb
    ```
 
@@ -56,17 +56,15 @@ JWT_SECRET_KEY=your_super_secret_jwt_key
 TELEGRAM_BOT_TOKEN=your_telegram_bot_token
 ```
 
-Запустите контейнеры: 
+### 3. Запустите контейнеры: 
 ```bash
 docker compose up -d --build
 ```
 Приложение будет доступно по адресам:
-
 Frontend: http://localhost:3000
-
 Backend API: http://localhost:8080
 
-Структура проекта
+### Структура проекта
 ```
 SmartFixWeb/
 ├── .github/workflows/   # Скрипты автоматического деплоя (CI/CD)
@@ -77,7 +75,7 @@ SmartFixWeb/
 └── docker-compose.yml   # Конфигурация Docker-сервисов
 ```
 
-### 3. Проверить `.gitignore`
+### 4. Проверить `.gitignore`
 
 Убедись, что в репозиторий **не попадают**:
 * Файлы `.env` с реальными паролями и ключами.
