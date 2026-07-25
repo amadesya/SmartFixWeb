@@ -61,8 +61,7 @@ services:
     networks:
       - app-network
     depends_on:
-      - smartfix-backendR
-
+      - smartfix-backend
 networks:
   app-network:
     driver: bridge
