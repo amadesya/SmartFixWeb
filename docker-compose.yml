@@ -9,6 +9,12 @@ services:
       MYSQL_DATABASE: ${DB_NAME}
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
+      ConnectionStrings__DefaultConnection: "Server=smartfix-db;Port=3306;Database=${DB_NAME};User=${DB_USER};Password=${DB_PASSWORD};"
+      Jwt__Key: "${JWT_SECRET_KEY}"
+      TelegramBot__Token: "${TELEGRAM_BOT_TOKEN}"
+      VapidKeys__PublicKey: "${VAPID_PUBLIC_KEY}"
+      VapidKeys__PrivateKey: "${VAPID_PRIVATE_KEY}"
+      ASPNETCORE_ENVIRONMENT: Production
     volumes:
       - mysql_data:/var/lib/mysql
       - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
