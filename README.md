@@ -1,8 +1,21 @@
+![.NET Core](https://img.shields.io/badge/.NET%208-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
+![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)
 # SmartFix — CRM/ERP-система для сервисного центра
 
 Веб-приложение для автоматизации работы сервисного центра по ремонту техники: управление заявками, учет клиентов, каталог услуг, авторизация и уведомления.
 
 **Демо приложения:** [https://smartfix.amadesu.space](https://smartfix.amadesu.space)
+
+## Скриншоты приложения
+
+|<img width="100%" alt="Price list" src="https://github.com/user-attachments/assets/56348603-4321-44bc-93a8-672399918360" /> | <img width="100%" alt="Admin Dashboard" src="https://github.com/user-attachments/assets/25ebee77-fddf-4f3f-9c9e-674ccc075874" /> |
+|:---:|:---:|
+| **Каталог услуг и витрина** | **Панель управления и заявки** |
 
 ## Технологический стек
 
