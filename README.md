@@ -28,7 +28,19 @@
 - **Интеграции:** Telegram Bot API (фоновые сервисы уведомлений)
 
 ## Архитектура
+```mermaid
+graph TD
+    Client[Пользовательский клиент / Браузер] -->|HTTPS / Port 443| Nginx[Nginx Reverse Proxy]
+    
+    subgraph Docker Network: app-network
+        Nginx -->|Proxy Pass / Port 3000| Frontend[React Frontend SPA]
+        Nginx -->|Proxy Pass / Port 8080| Backend[ASP.NET Core Web API]
+        Backend -->|MySQL Protocol / Port 3306| Database[(MySQL Database)]
+    end
 
+    Backend -->|HTTP / External API| Telegram[Telegram Bot API]
+    GitHub[GitHub Actions CI/CD] -->|SSH / Docker Compose| Nginx
+```
 - **REST API & Безопасность:** Авторизация на базе JWT-токенов, ролевая модель доступа.
 - **База данных:** Реляционная структура MySQL с EF Core миграциями и скриптами инициализации (`init.sql`).
 - **Контейнеризация:** Изолированный запуск всех сервисов (Backend, Frontend, Database) через Docker Compose.
