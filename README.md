@@ -4,8 +4,6 @@
 
 **Демо приложения (Live):** [https://smartfix.amadesu.space](https://smartfix.amadesu.space)
 
----
-
 ## Технологический стек
 
 - **Backend:** C# / .NET 8, ASP.NET Core Web API, Entity Framework Core, LINQ
@@ -15,8 +13,6 @@
 - **CI/CD:** GitHub Actions (автоматический деплой на VDS по SSH)
 - **Интеграции:** Telegram Bot API (фоновые сервисы уведомлений)
 
----
-
 ## Архитектура
 
 - **REST API & Безопасность:** Авторизация на базе JWT-токенов, ролевая модель доступа.
@@ -24,8 +20,6 @@
 - **Контейнеризация:** Изолированный запуск всех сервисов (Backend, Frontend, Database) через Docker Compose.
 - **Reverse Proxy & HTTPS:** Маршрутизация запросов и защита трафика с помощью Nginx и SSL-сертификатов Let's Encrypt.
 - **Автоматизация:** Настроен CI/CD pipeline в GitHub Actions для сборки и автоматического перезапуска контейнеров на production-сервере.
-
----
 
 ## Локальный запуск
 
@@ -68,7 +62,6 @@ SmartFixWeb/
 ├── scripts/             # SQL-скрипты инициализации БД
 └── docker-compose.yml   # Конфигурация Docker-сервисов
 ```
----
 
 ### 3. Проверить `.gitignore`
 
