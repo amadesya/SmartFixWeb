@@ -11,7 +11,7 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./init/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - app-network
     healthcheck:
@@ -47,13 +47,13 @@ services:
       context: ./frontend/
       dockerfile: Dockerfile
       args:
-        - VITE_API_URL=http://157.22.205.103:8080/api
+        - VITE_API_URL=http://smartfix.amadesu.space/api
     container_name: smartfix-frontend
     restart: always
     ports:
       - "3000:80"
     environment:
-      - VITE_API_URL=http://157.22.205.103:8080/api
+      - VITE_API_URL=http://smartfix.amadesu.space/api
     volumes:
       - ./backend/wwwroot/avatars:/usr/share/nginx/html/avatars:ro
       - ./backend/wwwroot/services:/usr/share/nginx/html/services:ro
