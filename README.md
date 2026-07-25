@@ -5,6 +5,7 @@
 ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)
+[![Deploy SmartFix](https://github.com/amadesya/SmartFixWeb/actions/workflows/deploy.yml/badge.svg)](https://github.com/amadesya/SmartFixWeb/actions)
 # SmartFix — CRM/ERP-система для сервисного центра
 
 Веб-приложение для автоматизации работы сервисного центра по ремонту техники: управление заявками, учет клиентов, каталог услуг, авторизация и уведомления.
