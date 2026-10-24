@@ -10,8 +10,6 @@
 
 Веб-приложение для автоматизации работы сервисного центра по ремонту техники: управление заявками, учет клиентов, каталог услуг, авторизация и уведомления.
 
-**Демо приложения:** [https://smartfix.amadesu.space](https://smartfix.amadesu.space)
-
 ## Скриншоты приложения
 
 |<img width="100%" alt="Price list" src="https://github.com/user-attachments/assets/56348603-4321-44bc-93a8-672399918360" /> | <img width="100%" alt="Admin Dashboard" src="https://github.com/user-attachments/assets/25ebee77-fddf-4f3f-9c9e-674ccc075874" /> |
